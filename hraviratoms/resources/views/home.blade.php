@@ -252,6 +252,7 @@ body, html {
                 </div>
                 <div class="row">
                     <div class="col-12">
+                        <p>ք․ Հրազդան</p>
                         <p><strong>Գրանադա Հոլլ</strong></p>
                     </div>
                 </div>
