@@ -230,7 +230,7 @@ body, html {
                 </div>
                 <div class="row">
                     <div class="col-12">
-                        <a href="https://www.google.com/maps" target="_blank" class="btn btn-map">Ինչպես հասնել</a>
+                        <a href="https://maps.app.goo.gl/ivm1GuDTJ7m1n5sn9" target="_blank" class="btn btn-map">Ինչպես հասնել</a>
                     </div>
                 </div>
             </div>
@@ -257,7 +257,7 @@ body, html {
                 </div>
                 <div class="row">
                     <div class="col-12">
-                        <a href="https://www.google.com/maps" target="_blank" class="btn btn-map">Ինչպես հասնել</a>
+                        <a href="https://share.google/xBCpCwf5nEPHTqeZq" target="_blank" class="btn btn-map">Ինչպես հասնել</a>
                     </div>
                 </div>
             </div>
@@ -266,7 +266,7 @@ body, html {
 </body>
 
 <script>
-const weddingDate = new Date("2025-12-25T14:00:00").getTime();
+const weddingDate = new Date("2025-11-16T14:00:00").getTime();
 const countdownElement = document.getElementById('countdown');
 
 function updateCountdown() {
