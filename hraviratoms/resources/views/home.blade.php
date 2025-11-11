@@ -145,7 +145,6 @@ body, html {
     -webkit-backdrop-filter: blur(10px);
     border-radius: 15px;
     padding: 20px;
-    display: inline-block;
 }
 
 /* Адаптивность */
@@ -175,7 +174,7 @@ body, html {
 <body>
     <!-- <div class="page-wrapper">  -->
         <div class="hero-s">
-            <div class="container text-center start-content">
+            <div class="blur-box container text-center start-content">
                 <div class="row">
                     <div class="col-12">
                         <img src="/images/anun.png" style="max-width:300px;" alt="">
@@ -208,7 +207,7 @@ body, html {
                 </div>
                 
             </div>
-            <div class="container text-center pt-5">
+            <div class="blur-box container text-center pt-5">
                 <div class="row">
                     <div class="col-12">
                         <img src="/images/mat.png" style="max-width:300px;" alt="">
@@ -235,7 +234,7 @@ body, html {
                     </div>
                 </div>
             </div>
-            <div class="container text-center pt-5 pb-5 mb-5">
+            <div class="blur-box container text-center pt-5 pb-5 mb-5">
                 <div class="row">
                     <div class="col-12">
                         <img src="/images/res.png" style="max-width:300px;" alt="">
