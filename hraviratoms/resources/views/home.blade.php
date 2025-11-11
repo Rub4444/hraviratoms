@@ -139,6 +139,14 @@ body, html {
     font-size: 1.5rem;
     color: #ffe5b4; /* светло-бежевый/кремовый цвет для разделителей */
 }
+.blur-box {
+    background: rgba(0,0,0,0.25); /* лёгкая дымка */
+    backdrop-filter: blur(10px);  /* главное — красивое размытие */
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 15px;
+    padding: 20px;
+    display: inline-block;
+}
 
 /* Адаптивность */
 @media(max-width: 768px) {
@@ -152,99 +160,110 @@ body, html {
         font-size: 1.5rem;
     }
 }
+.page-wrapper {
+    width: 100%;
+    min-height: 100vh; /* pokryvaet ves’ ekran */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 50px 15px;
+}
+
 </style>
 
 </head>
 <body>
-<div class="hero-s">
-    <div class="container text-center start-content">
-        <div class="row">
-            <div class="col-12">
-                <img src="/images/anun.png" style="max-width:300px;" alt="">
-            </div>
-        </div>
-        
-        <div class="row">
-            <div class="col-12">
-                <h3>Հարսանիքին մնաց՝</h3>
-                <div id="countdown" class="timer"></div>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-12">
-                <p>
-                    Սիրով հրավիրում ենք Ձեզ կիսելու մեզ հետ մեր կյանքի կարևոր և հիշարժան օրը
-                </p>
-                <div class="wedding-date">
-                    <div class="date-box">
-                        <span class="day">16</span>
-                        <span class="separator">|</span>
-                        <span class="month">11</span>
-                        <span class="separator">|</span>
-                        <span class="year">2025</span>
+    <!-- <div class="page-wrapper">  -->
+        <div class="hero-s">
+            <div class="container text-center start-content">
+                <div class="row">
+                    <div class="col-12">
+                        <img src="/images/anun.png" style="max-width:300px;" alt="">
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-12">
+                        <h3 style="color:white;">Հարսանիքին մնաց՝</h3>
+                        <div id="countdown" class="timer"></div>
                     </div>
                 </div>
 
+                <div class="row">
+                    <div class="col-12">
+                        <p style="color:white;">
+                            Սիրով հրավիրում ենք Ձեզ կիսելու մեզ հետ մեր կյանքի կարևոր և հիշարժան օրը
+                        </p>
+                        <div class="wedding-date">
+                            <div class="date-box">
+                                <span class="day">16</span>
+                                <span class="separator">|</span>
+                                <span class="month">11</span>
+                                <span class="separator">|</span>
+                                <span class="year">2025</span>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                
+            </div>
+            <div class="container text-center pt-5">
+                <div class="row">
+                    <div class="col-12">
+                        <img src="/images/mat.png" style="max-width:300px;" alt="">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <h2 style="color:white;">Պսակադրության արարողություն</h2>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <p><strong>14:00</strong></p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <p><strong>Հաղարծին Վանական Համալիր</strong></p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <a href="https://www.google.com/maps" target="_blank" class="btn btn-map">Ինչպես հասնել</a>
+                    </div>
+                </div>
+            </div>
+            <div class="container text-center pt-5 pb-5 mb-5">
+                <div class="row">
+                    <div class="col-12">
+                        <img src="/images/res.png" style="max-width:300px;" alt="">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <h2>Հարսանյաց Հանդիսություն</h2>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <p><strong>17:00</strong></p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <p><strong>Գրանադա Հոլլ</strong></p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <a href="https://www.google.com/maps" target="_blank" class="btn btn-map">Ինչպես հասնել</a>
+                    </div>
+                </div>
             </div>
         </div>
-        
-    </div>
-    <div class="container text-center pt-5">
-        <div class="row">
-            <div class="col-12">
-                <img src="/images/mat.png" style="max-width:300px;" alt="">
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-12">
-                <h2>Պսակադրության արարողություն</h2>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-12">
-                <p><strong>14:00</strong></p>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-12">
-                <p><strong>Հաղարծին Վանական Համալիր</strong></p>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-12">
-                <a href="https://www.google.com/maps" target="_blank" class="btn btn-map">Ինչպես հասնել</a>
-            </div>
-        </div>
-    </div>
-    <div class="container text-center pt-5 pb-5 mb-5">
-        <div class="row">
-            <div class="col-12">
-                <img src="/images/res.png" style="max-width:300px;" alt="">
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-12">
-                <h2>Հարսանյաց Հանդիսություն</h2>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-12">
-                <p><strong>17:00</strong></p>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-12">
-                <p><strong>Գրանադա Հոլլ</strong></p>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-12">
-                <a href="https://www.google.com/maps" target="_blank" class="btn btn-map">Ինչպես հասնել</a>
-            </div>
-        </div>
-    </div>
-</div>
+    <!-- </div> -->
 </body>
 
 <script>
