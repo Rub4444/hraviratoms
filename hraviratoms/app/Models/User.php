@@ -40,6 +40,18 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'is_superadmin'     => 'boolean',
         'password' => 'hashed',
     ];
+
+      public function isSuperAdmin(): bool
+    {
+        return (bool) $this->is_superadmin;
+    }
+
+    public function invitations()
+    {
+        return $this->hasMany(Invitation::class);
+    }
+
 }

@@ -46,4 +46,10 @@ class Invitation extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function rsvps()
+    {
+        return $this->hasMany(InvitationRsvp::class);
+    }
+
 }

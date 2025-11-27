@@ -46,7 +46,7 @@
             <p class="mt-2 text-xs uppercase tracking-[0.25em] text-slate-500">
                 Dress code: {{ $invitation->dress_code }}
             </p>
-        @endif>
+        @endif
     </div>
 
     @php
@@ -73,7 +73,7 @@
         </div>
     @endif
 
-    <div class="border-t border-white/30 border-slate-200/70 px-6 py-5 text-center">
+        <div class="border-t border-white/30 border-slate-200/70 px-6 py-5 text-center">
         <p class="text-xs text-slate-500">
             Սիրով հրավիրում ենք Ձեզ կիսելու մեր հատուկ օրը։
         </p>
@@ -81,7 +81,138 @@
             {{ $invitation->bride_name }} &amp; {{ $invitation->groom_name }}
         </p>
     </div>
+
+    {{-- RSVP блок --}}
+    <div class="border-t border-white/30 border-slate-200/70 px-6 py-6">
+        <h2 class="mb-3 text-xs font-semibold tracking-[0.25em] uppercase text-slate-500">
+            Հաստատեք մասնակցությունը
+        </h2>
+
+        @if(session('rsvp_success'))
+            <div class="mb-3 rounded-xl bg-leaf-soft/20 px-4 py-2 text-xs text-leaf-deep">
+                Շնորհակալություն պատասխանի համար 🕊️ Ձեր տվյալները պահպանված են։
+            </div>
+        @endif
+
+        <form method="POST" action="{{ route('invitation.public.rsvp', $invitation->slug) }}" class="grid gap-3 text-left md:grid-cols-2">
+            @csrf
+
+            <div class="md:col-span-2">
+                <label class="block text-[11px] font-medium text-slate-600">
+                    Անուն, Ազգանուն
+                </label>
+                <input
+                    type="text"
+                    name="guest_name"
+                    value="{{ old('guest_name') }}"
+                    required
+                    class="mt-1 block w-full rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-leaf focus:ring-leaf"
+                >
+                @error('guest_name')
+                    <p class="mt-1 text-[11px] text-red-500">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div>
+                <label class="block text-[11px] font-medium text-slate-600">
+                    Հեռախոս (ըստ ցանկության)
+                </label>
+                <input
+                    type="text"
+                    name="guest_phone"
+                    value="{{ old('guest_phone') }}"
+                    class="mt-1 block w-full rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-leaf focus:ring-leaf"
+                >
+                @error('guest_phone')
+                    <p class="mt-1 text-[11px] text-red-500">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div>
+                <label class="block text-[11px] font-medium text-slate-600">
+                    Քանի՞ մարդ կմասնակցի
+                </label>
+                <input
+                    type="number"
+                    name="guests_count"
+                    min="1"
+                    max="20"
+                    value="{{ old('guests_count', 1) }}"
+                    class="mt-1 block w-full rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-leaf focus:ring-leaf"
+                >
+                @error('guests_count')
+                    <p class="mt-1 text-[11px] text-red-500">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div>
+                <label class="block text-[11px] font-medium text-slate-600">
+                    Մասակցության կարգավիճակ
+                </label>
+                <div class="mt-1 flex gap-2 text-[11px] text-slate-700">
+                    <label class="inline-flex items-center gap-1">
+                        <input
+                            type="radio"
+                            name="status"
+                            value="yes"
+                            class="h-3 w-3 rounded border-slate-300 text-leaf focus:ring-leaf"
+                            {{ old('status', 'yes') === 'yes' ? 'checked' : '' }}
+                        >
+                        Կգամ
+                    </label>
+                    <label class="inline-flex items-center gap-1">
+                        <input
+                            type="radio"
+                            name="status"
+                            value="maybe"
+                            class="h-3 w-3 rounded border-slate-300 text-leaf focus:ring-leaf"
+                            {{ old('status') === 'maybe' ? 'checked' : '' }}
+                        >
+                        Հնարավոր է
+                    </label>
+                    <label class="inline-flex items-center gap-1">
+                        <input
+                            type="radio"
+                            name="status"
+                            value="no"
+                            class="h-3 w-3 rounded border-slate-300 text-leaf focus:ring-leaf"
+                            {{ old('status') === 'no' ? 'checked' : '' }}
+                        >
+                        Վերջապես չեմ կարող
+                    </label>
+                </div>
+                @error('status')
+                    <p class="mt-1 text-[11px] text-red-500">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div class="md:col-span-2">
+                <label class="block text-[11px] font-medium text-slate-600">
+                    Լրացուցիչ տեղեկություն (ըստ ցանկության)
+                </label>
+                <textarea
+                    name="message"
+                    rows="3"
+                    class="mt-1 block w-full rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-leaf focus:ring-leaf"
+                    placeholder="Օրինակ՝ կունենանք երեխա մեզ հետ, պետք է հատուկ սնունդ, կուշանանք 15 րոպե և այլն։"
+                >{{ old('message') }}</textarea>
+                @error('message')
+                    <p class="mt-1 text-[11px] text-red-500">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div class="md:col-span-2 flex justify-end">
+                <button
+                    type="submit"
+                    class="inline-flex items-center justify-center rounded-full bg-leaf px-5 py-2 text-xs font-medium text-white shadow-sm shadow-leaf/40 hover:bg-leaf-deep"
+                >
+                    Ուղարկել պատասխաններս
+                </button>
+            </div>
+        </form>
+    </div>
 </div>
 </body>
 </html>
+
 

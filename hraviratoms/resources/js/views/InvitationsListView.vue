@@ -91,30 +91,41 @@
               </button>
             </td>
             <td class="px-4 py-3 align-top text-right text-xs">
-              <div class="flex justify-end gap-2">
-                <a
-                  :href="getPublicUrl(invitation)"
-                  target="_blank"
-                  class="rounded-full border border-slate-200 px-3 py-1 font-medium hover:bg-slate-50"
-                >
-                  Open
-                </a>
-                <button
-                  class="rounded-full bg-slate-900 px-3 py-1 font-medium text-white hover:bg-slate-800"
-                  type="button"
-                  @click="$router.push({ name: 'invitations.edit', params: { id: invitation.id } })"
-                >
-                  Edit
-                </button>
-                <button
+                <div class="flex flex-wrap justify-end gap-2">
+                    <a
+                    :href="getPublicUrl(invitation)"
+                    target="_blank"
+                    class="rounded-full border border-slate-200 px-3 py-1 font-medium hover:bg-slate-50"
+                    >
+                    Open
+                    </a>
+
+                    <button
+                    class="rounded-full bg-slate-900 px-3 py-1 font-medium text-white hover:bg-slate-800"
+                    type="button"
+                    @click="$router.push({ name: 'invitations.edit', params: { id: invitation.id } })"
+                    >
+                    Edit
+                    </button>
+
+                    <button
+                    class="rounded-full border border-leaf-soft px-3 py-1 font-medium text-leaf-deep hover:bg-leaf-soft/20"
+                    type="button"
+                    @click="$router.push({ name: 'invitations.rsvps', params: { id: invitation.id } })"
+                    >
+                    RSVP
+                    </button>
+
+                    <button
                     class="rounded-full bg-red-500 px-3 py-1 font-medium text-white hover:bg-red-600"
                     type="button"
                     @click="deleteInvitation(invitation)"
                     >
                     Delete
-                </button>
-              </div>
-            </td>
+                    </button>
+                </div>
+                </td>
+
           </tr>
         </tbody>
       </table>

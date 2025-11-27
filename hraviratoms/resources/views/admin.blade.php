@@ -12,6 +12,15 @@
 
 </head>
 <body class="antialiased">
+    <form method="POST" action="{{ route('logout') }}">
+        @csrf
+        <button
+            type="submit"
+            class="rounded-full border border-slate-300 px-3 py-1 text-xs text-slate-700 hover:bg-slate-100"
+        >
+            Выйти
+        </button>
+    </form>
     <div id="app"></div>
 </body>
 </html>

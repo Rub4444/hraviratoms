@@ -67,8 +67,11 @@
             <nav class="hidden gap-5 text-xs text-slate-600 sm:flex">
                 <a href="#how" class="hover:text-leaf-deep">Ինչպես է աշխատում</a>
                 <a href="#templates" class="hover:text-leaf-deep">Դիզայններ</a>
+                <a href="#pricing" class="hover:text-leaf-deep">Գնացուցակ</a>
+                <a href="#faq" class="hover:text-leaf-deep">FAQ</a>
                 <a href="#contact" class="hover:text-leaf-deep">Կապ</a>
             </nav>
+
             <a
                 href="/admin"
                 class="inline-flex items-center justify-center rounded-full bg-leaf px-4 py-1.5 text-xs font-medium text-white shadow-sm shadow-leaf/40 hover:bg-leaf-deep"
@@ -220,9 +223,190 @@
                 Հնարավոր է ստեղծել նաև լրիվ անհատական դիզայն՝ ըստ ձեր հարսանիքի կոնցեպտի։
             </p>
         </section>
+                {{-- Գնացուցակ / Тарифы --}}
+        <section id="pricing" class="mt-12 border-t border-slate-200 pt-10">
+            <h2 class="text-sm font-semibold uppercase tracking-[0.25em] text-slate-700 font-display">
+                Գնացուցակ • LoveLeaf փաթեթներ
+            </h2>
+            <p class="mt-2 text-sm text-slate-700">
+                Ընտրեք այն տարբերակը, որը համապատասխանում է ձեր հարսանիքի ձևաչափին և բյուջեին։
+            </p>
+
+            <div class="mt-6 grid gap-5 md:grid-cols-3 text-sm">
+                {{-- Basic --}}
+                <div class="rounded-2xl border border-slate-200/80 bg-white/90 p-5 shadow-sm">
+                    <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+                        LoveLeaf Basic
+                    </p>
+                    <p class="mt-2 text-lg font-display text-slate-900">
+                        Պարզ և նուրբ օնլայն հրավիրատոմս
+                    </p>
+
+                    <p class="mt-3 text-2xl font-semibold text-slate-900">
+                        10 000 <span class="text-sm font-normal text-slate-600">AMD</span>
+                    </p>
+
+                    <ul class="mt-4 space-y-1.5 text-[13px] text-slate-700">
+                        <li>• 1 դիզայն՝ LoveLeaf հավաքածուից</li>
+                        <li>• Միափուլ էջ՝ անուններ, ամսաթիվ, ժամ, վայր</li>
+                        <li>• Կարճ շնորհավորական տեքստ</li>
+                        <li>• Ծրագիր՝ մինչև 3 կետ</li>
+                        <li>• 1 լեզու (HY կամ RU)</li>
+                        <li>• 1 փոփոխություն բովանդակության մեջ</li>
+                    </ul>
+
+                    <a
+                        href="https://t.me/your_username_here"
+                        target="_blank"
+                        class="mt-5 inline-flex w-full items-center justify-center rounded-full border border-slate-300 px-4 py-2 text-xs font-medium text-slate-800 hover:bg-white"
+                    >
+                        Պատվիրել Basic Telegram-ով
+                    </a>
+                </div>
+
+                {{-- Comfort (рекомендуемый) --}}
+                <div class="relative rounded-2xl border border-leaf-soft bg-white p-5 shadow-md shadow-leaf/10">
+                    <div class="absolute -top-3 right-4 rounded-full bg-leaf text-[10px] font-medium uppercase tracking-[0.18em] text-white px-3 py-1 shadow-sm">
+                        Ամենահայտնին
+                    </div>
+
+                    <p class="text-xs font-semibold uppercase tracking-[0.2em] text-leaf-deep">
+                        LoveLeaf Comfort
+                    </p>
+                    <p class="mt-2 text-lg font-display text-slate-900">
+                        Հարմար տարբերակ՝ ծրագիր, քարտեզ և 2 լեզու
+                    </p>
+
+                    <p class="mt-3 text-2xl font-semibold text-slate-900">
+                        20 000 <span class="text-sm font-normal text-slate-600">AMD</span>
+                    </p>
+
+                    <ul class="mt-4 space-y-1.5 text-[13px] text-slate-700">
+                        <li>• Ցանկացած դիզայն՝ LoveLeaf հավաքածուից</li>
+                        <li>• Անձնական էջ՝ հիմնական տվյալներով</li>
+                        <li>• Ծրագիր՝ մինչև 6 կետ</li>
+                        <li>• Քարտեզի հղում (Google Maps)</li>
+                        <li>• Dress code բաժին</li>
+                        <li>• Մինչև 2 լեզու (օր․ HY + RU)</li>
+                        <li>• Մինչև 3 փոփոխություն բովանդակության մեջ</li>
+                        <li>• Էջը ակտիվ է մինչև 3 ամիս հարսանից հետո</li>
+                    </ul>
+
+                    <a
+                        href="https://t.me/your_username_here"
+                        target="_blank"
+                        class="mt-5 inline-flex w-full items-center justify-center rounded-full bg-leaf px-4 py-2 text-xs font-medium text-white shadow-sm shadow-leaf/40 hover:bg-leaf-deep"
+                    >
+                        Պատվիրել Comfort Telegram-ով
+                    </a>
+                </div>
+
+                {{-- Premium --}}
+                <div class="rounded-2xl border border-gold-light bg-love-blush/60 p-5 shadow-sm">
+                    <p class="text-xs font-semibold uppercase tracking-[0.2em] text-gold-dark">
+                        LoveLeaf Premium
+                    </p>
+                    <p class="mt-2 text-lg font-display text-slate-900">
+                        Անհատականացված լուծում ձեր հարսանիքի համար
+                    </p>
+
+                    <p class="mt-3 text-2xl font-semibold text-slate-900">
+                        35 000 <span class="text-sm font-normal text-slate-600">AMD</span>
+                    </p>
+
+                    <ul class="mt-4 space-y-1.5 text-[13px] text-slate-700">
+                        <li>• Անհատականացված կառուցվածք և գունային լուծում</li>
+                        <li>• Լրացուցիչ բաժին՝ «Մեր պատմությունը»</li>
+                        <li>• Բաժին՝ ծնողների / քավորների մասին</li>
+                        <li>• Հատուկ նշումներ՝ նվերների, ծաղիկների, children-free և այլն</li>
+                        <li>• Մինչև 3 լեզու</li>
+                        <li>• Փոքր փոփոխություններ՝ մինչև հարսանիքի օրը</li>
+                        <li>• Խորհրդատվություն WhatsApp / Telegram-ով</li>
+                    </ul>
+
+                    <a
+                        href="https://t.me/your_username_here"
+                        target="_blank"
+                        class="mt-5 inline-flex w-full items-center justify-center rounded-full border border-gold-dark px-4 py-2 text-xs font-medium text-slate-900 hover:bg-white/80"
+                    >
+                        Քննարկել Premium Telegram-ով
+                    </a>
+                </div>
+            </div>
+
+            <p class="mt-3 text-[11px] text-slate-500">
+                * Գները նախնական են․ կարող են ճշգրտվել՝ կախված ձեր հարսանիքի բարդությունից և լրացուցիչ պահանջներից։
+            </p>
+        </section>
+                {{-- Հաճախ տրվող հարցեր / FAQ --}}
+        <section id="faq" class="mt-12 border-t border-slate-200 pt-10">
+            <h2 class="text-sm font-semibold uppercase tracking-[0.25em] text-slate-700 font-display">
+                Հաճախ տրվող հարցեր
+            </h2>
+            <p class="mt-2 text-sm text-slate-700">
+                Մի քանի սթանդարտ հարց, որոնք զույգերը տալիս են LoveLeaf օնլայն հրավիրատոմս պատվիրելիս։
+            </p>
+
+            <div class="mt-5 grid gap-4 md:grid-cols-2 text-sm">
+                {{-- Q1 --}}
+                <div class="rounded-2xl border border-slate-200/80 bg-white/90 p-4">
+                    <p class="text-xs font-semibold text-leaf-deep">
+                        Ինչպե՞ս եմ ես տալիս տվյալները հրավիրատոմսի համար։
+                    </p>
+                    <p class="mt-1 text-[13px] text-slate-700">
+                        Պարզ է․ դուք գրում եք մեզ Telegram-ով կամ WhatsApp-ով, ուղարկում եք անունները, ամսաթիվը, վայրը,
+                        ծրագիրը և այլ մանրամասներ, իսկ մենք լրացնում ենք LoveLeaf հրավիրատոմսը ձեր փոխարեն։
+                    </p>
+                </div>
+
+                {{-- Q2 --}}
+                <div class="rounded-2xl border border-slate-200/80 bg-white/90 p-4">
+                    <p class="text-xs font-semibold text-leaf-deep">
+                        Կարո՞ղ ենք փոփոխել տեքստը, եթե ինչ-որ բան փոխվի։
+                    </p>
+                    <p class="mt-1 text-[13px] text-slate-700">
+                        Այո․ յուրաքանչյուր փաթեթում ներառված է որոշակի քանակի փոփոխություն (Basic՝ 1, Comfort՝ 3, Premium՝ ավելի
+                        ճկուն)․ օրինակ՝ ժամի փոփոխություն, փոքր շեշտադրումներ և այլն։
+                    </p>
+                </div>
+
+                {{-- Q3 --}}
+                <div class="rounded-2xl border border-slate-200/80 bg-white/90 p-4">
+                    <p class="text-xs font-semibold text-leaf-deep">
+                        Որքա՞ն ժամանակով է ակտիվ մնում մեր հրավիրատոմսը։
+                    </p>
+                    <p class="mt-1 text-[13px] text-slate-700">
+                        Սովորաբար էջը մնում է ակտիվ մինչև հարսանիքի օրը, իսկ Comfort և Premium փաթեթների դեպքում՝
+                        մինչև 3 ամիս հարսանից հետո, որպեսզի հյուրերը կարողանան հիշել օրը և տեսնել լింకը նաև հետո։
+                    </p>
+                </div>
+
+                {{-- Q4 --}}
+                <div class="rounded-2xl border border-slate-200/80 bg-white/90 p-4">
+                    <p class="text-xs font-semibold text-leaf-deep">
+                        Կարո՞ղ ենք ունենալ հրավիրատոմս մի քանի լեզվով։
+                    </p>
+                    <p class="mt-1 text-[13px] text-slate-700">
+                        Այո․ Comfort փաթեթով կարելի է ունենալ մինչև 2 լեզու (օրինակ՝ HY + RU), իսկ Premium տարբերակով՝ մինչև 3 լեզու։
+                        Մենք կօգնենք ձեզ ճիշտ ձևակերպել տեքստերը։
+                    </p>
+                </div>
+
+                {{-- Q5 --}}
+                <div class="rounded-2xl border border-slate-200/80 bg-white/90 p-4 md:col-span-2">
+                    <p class="text-xs font-semibold text-leaf-deep">
+                        Ինչպե՞ս ենք վճարում և երբ ենք ստանում վերջնական լింకը։
+                    </p>
+                    <p class="mt-1 text-[13px] text-slate-700">
+                        Վճարումը կարող է լինել բանկային փոխանցմամբ կամ քարտով (կարող ես գրել Telegram-ով՝ մանրամասների համար)։
+                        Սովորաբար առաջին տարբերակը ստանում եք 1–2 օրվա ընթացքում, իսկ վերջնական լింకը՝ ձեր հաստատումից հետո։
+                    </p>
+                </div>
+            </div>
+        </section>
 
         {{-- Կապ / համագործակցություն --}}
-        <section id="contact" class="mt-12 border-t border-slate-200 pt-10">
+        <!-- <section id="contact" class="mt-12 border-t border-slate-200 pt-10">
             <h2 class="text-sm font-semibold uppercase tracking-[0.25em] text-slate-700 font-display">
                 Պատվերներ և համագործակցություն
             </h2>
@@ -248,7 +432,7 @@
                     Գրեք, և մենք կառաջարկենք տարբերակ՝ ըստ ձեր բյուջեի և նախասիրությունների։
                 </span>
             </div>
-        </section>
+        </section> -->
     </main>
 
     <footer class="mt-10 border-t border-slate-200 py-4">

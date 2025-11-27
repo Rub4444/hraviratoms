@@ -2,26 +2,65 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PublicInvitationController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Api\InvitationTemplateController;
+use App\Http\Controllers\Api\InvitationController;
+use App\Http\Controllers\InvitationRsvpController;
+use App\Http\Controllers\Api\UserController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
 */
 
+// Главная LoveLeaf
 Route::get('/', function () {
     return view('landing');
 })->name('landing');
 
-
-Route::get('/admin/{any?}', function () {
-    return view('admin');
-})->where('any', '.*');
-
-
+// Публичные приглашения + RSVP
 Route::get('/i/{slug}', [PublicInvitationController::class, 'show'])
     ->name('invitation.public.show');
+
+Route::post('/i/{slug}/rsvp', [PublicInvitationController::class, 'submitRsvp'])
+    ->name('invitation.public.rsvp');
+
+// Аутентификация
+Route::get('/login', [AuthController::class, 'showLoginForm'])
+    ->name('login');
+
+Route::post('/login', [AuthController::class, 'login'])
+    ->name('login.perform');
+
+Route::post('/logout', [AuthController::class, 'logout'])
+    ->name('logout');
+
+// Всё, что ниже — только для залогиненных
+Route::middleware('auth')->group(function () {
+
+    // Vue SPA Admin
+    Route::get('/admin/{any?}', function () {
+        return view('admin');
+    })->where('any', '.*');
+
+    // Admin API (для Vue) — доступен только после логина
+    Route::prefix('api')->group(function () {
+
+        Route::get('/users', [UserController::class, 'index']);
+
+        // Шаблоны приглашений
+        Route::get('/templates', [InvitationTemplateController::class, 'index']);
+        Route::get('/templates/{key}', [InvitationTemplateController::class, 'show']);
+
+        // Приглашения
+        Route::get('/invitations', [InvitationController::class, 'index']);
+        Route::post('/invitations', [InvitationController::class, 'store']);
+        Route::get('/invitations/{invitation}', [InvitationController::class, 'show']);
+        Route::put('/invitations/{invitation}', [InvitationController::class, 'update']);
+        Route::delete('/invitations/{invitation}', [InvitationController::class, 'destroy']);
+
+        // RSVP-статистика по приглашению
+        Route::get('/invitations/{invitation}/rsvps', [InvitationRsvpController::class, 'index']);
+    });
+});

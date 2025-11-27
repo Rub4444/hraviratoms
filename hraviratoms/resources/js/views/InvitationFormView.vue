@@ -6,7 +6,29 @@
     <p class="mb-5 text-sm text-slate-600">
       {{ templateTitle }}
     </p>
-
+    <div
+    v-if="users.length"
+    class="col-span-2"
+    >
+        <label class="block text-[11px] font-medium text-slate-600 mb-1">
+            Кто может видеть статистику (владелец)
+        </label>
+        <select
+            v-model="form.user_id"
+            class="mt-1 block w-full rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-leaf focus:ring-leaf"
+        >
+            <option :value="null">
+            Только супер-админ (не привязано к аккаунту)
+            </option>
+            <option
+            v-for="u in users"
+            :key="u.id"
+            :value="u.id"
+            >
+            {{ u.name }} ({{ u.email }}) <span v-if="u.is_superadmin">— Superadmin</span>
+            </option>
+        </select>
+    </div>
     <div class="grid gap-6 md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
       <!-- Форма -->
       <form class="space-y-4" @submit.prevent="handleSubmit">
@@ -203,7 +225,29 @@ const form = ref({
   venue_address: '',
   dress_code: '',
   is_published: false,
+  user_id: null,
 });
+
+const users = ref([]);
+const loadingUsers = ref(false);
+
+const fetchUsers = async () => {
+  loadingUsers.value = true;
+  try {
+    const res = await fetch('/api/users');
+    if (!res.ok) {
+      // если не супер-админ → вернётся 403, просто игнорируем
+      return;
+    }
+
+    const data = await res.json();
+    users.value = data;
+  } catch (e) {
+    console.error('Error loading users', e);
+  } finally {
+    loadingUsers.value = false;
+  }
+};
 
 const program = ref([
   { time: '18:00', label: 'Welcome drink' },
@@ -237,6 +281,7 @@ onMounted(async () => {
       form.value.venue_address = data.venue_address || '';
       form.value.dress_code = data.dress_code || '';
       form.value.is_published = !!data.is_published;
+      form.value.user_id = data.user_id ?? null;
 
       const programData = data.data?.program;
       if (Array.isArray(programData) && programData.length) {

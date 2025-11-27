@@ -3,6 +3,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 const TemplatesListView = () => import('../views/TemplatesListView.vue');
 const InvitationsListView = () => import('../views/InvitationsListView.vue');
 const InvitationFormView = () => import('../views/InvitationFormView.vue');
+const InvitationRsvpListView = () => import('../views/InvitationRsvpListView.vue');
 
 const routes = [
     {
@@ -25,6 +26,12 @@ const routes = [
         path: '/invitations/:id/edit',
         name: 'invitations.edit',
         component: InvitationFormView,
+        props: true,
+    },
+    {
+        path: '/invitations/:id/rsvps',
+        name: 'invitations.rsvps',
+        component: InvitationRsvpListView,
         props: true,
     },
 ];
