@@ -1,0 +1,119 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* База шрифтов + фонов */
+@layer base {
+
+    html,
+    body {
+        @apply font-body bg-leaf-bg text-slate-900;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4 {
+        @apply font-display text-slate-900;
+    }
+
+    a {
+        @apply text-leaf-deep;
+    }
+
+    a:hover {
+        @apply text-leaf;
+    }
+}
+
+/* Универсальные кнопки */
+@layer components {
+    .btn-primary {
+        @apply inline-flex items-center justify-center rounded-full bg-leaf px-4 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-leaf-deep;
+    }
+
+    .btn-outline {
+        @apply inline-flex items-center justify-center rounded-full border border-slate-300 px-4 py-1.5 text-xs font-medium text-slate-700 hover:bg-white;
+    }
+
+    .chip-pill {
+        @apply inline-flex items-center rounded-full bg-love-blush/80 px-3 py-1 text-[11px] font-medium text-slate-700;
+    }
+
+    .card-soft {
+        @apply rounded-2xl border border-slate-200/70 bg-white/90 shadow-sm;
+    }
+}
+
+/* Темы приглашений — перекрашиваем под LoveLeaf */
+@layer utilities {
+    .invite-page {
+        @apply min-h-screen flex items-center justify-center bg-leaf-bg;
+    }
+
+    .invite-card {
+        @apply max-w-xl w-full rounded-3xl border shadow-xl overflow-hidden bg-white;
+    }
+
+    /* Elegant Minimal */
+    .theme-elegant-minimal .invite-card {
+        @apply bg-white border-gold-light;
+    }
+
+    .theme-elegant-minimal .invite-names {
+        @apply font-display text-3xl tracking-[0.3em] uppercase text-slate-900;
+    }
+
+    .theme-elegant-minimal .invite-accent {
+        @apply text-gold-dark;
+    }
+
+    /* Nature Green */
+    .theme-nature-green .invite-card {
+        @apply bg-white border-leaf-soft;
+        background-image:
+            radial-gradient(circle at 0 0, #E6F0E8 0, transparent 60%),
+            radial-gradient(circle at 100% 100%, #E6F0E8 0, transparent 60%);
+    }
+
+    .theme-nature-green .invite-names {
+        @apply font-display text-3xl text-leaf-deep;
+    }
+
+    .theme-nature-green .invite-accent {
+        @apply text-leaf;
+    }
+
+    /* Luxury Black & Gold */
+    .theme-luxury-black-gold .invite-page {
+        @apply bg-slate-950;
+    }
+
+    .theme-luxury-black-gold .invite-card {
+        @apply bg-gradient-to-b from-slate-900 to-slate-950 border-gold-dark;
+    }
+
+    .theme-luxury-black-gold .invite-names {
+        @apply font-display text-3xl tracking-[0.4em] text-gold-light uppercase;
+    }
+
+    .theme-luxury-black-gold .invite-accent {
+        @apply text-gold-light;
+    }
+
+    /* Romantic Pastel */
+    .theme-romantic-pastel .invite-card {
+        @apply bg-white border-pink-200;
+        background-image:
+            radial-gradient(circle at 0 10%, #FBE7F1 0, transparent 60%),
+            radial-gradient(circle at 100% 90%, #FFEFF6 0, transparent 60%);
+    }
+
+    .theme-romantic-pastel .invite-names {
+        @apply text-3xl font-script text-pink-700;
+    }
+
+    .theme-romantic-pastel .invite-accent {
+        @apply text-pink-500;
+    }
+}

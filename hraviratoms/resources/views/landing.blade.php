@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="hy" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <title>LoveLeaf • Օնլայն հարսանեկան հրավիրատոմսեր</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    {{-- Google Fonts --}}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Dancing+Script:wght@400;600&family=Inter:wght@400;500;600&family=Playfair+Display:wght@500;600&display=swap"
+        rel="stylesheet">
+
+    {{-- Tailwind через CDN с конфигом LoveLeaf --}}
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              leaf: {
+                DEFAULT: '#5CA371',
+                soft: '#A7D3B5',
+                deep: '#447D56',
+                bg: '#FAF8F4',
+              },
+              gold: {
+                light: '#ECDDBB',
+                DEFAULT: '#D9C79E',
+                dark: '#A9966C',
+              },
+              love: {
+                blush: '#F6ECE8',
+              },
+            },
+            fontFamily: {
+              logo: ['"Playfair Display"', 'serif'],
+              display: ['"Cormorant Garamond"', 'serif'],
+              body: ['Inter', 'system-ui', 'sans-serif'],
+              script: ['"Dancing Script"', 'cursive'],
+            },
+          }
+        }
+      }
+    </script>
+</head>
+<body class="h-full bg-leaf-bg text-slate-900 antialiased font-body">
+<div class="min-h-full">
+
+    {{-- Навбар --}}
+    <header class="border-b border-slate-200/70 bg-white/80 backdrop-blur">
+        <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
+            <div class="flex items-center gap-2">
+                <div class="flex h-9 w-9 items-center justify-center rounded-full bg-leaf text-white text-xs font-logo">
+                    LL
+                </div>
+                <div class="flex flex-col leading-tight">
+                    <span class="text-sm font-logo tracking-wide">
+                        LoveLeaf
+                    </span>
+                    <span class="text-[11px] text-slate-500">
+                        Online Wedding Invites
+                    </span>
+                </div>
+            </div>
+            <nav class="hidden gap-5 text-xs text-slate-600 sm:flex">
+                <a href="#how" class="hover:text-leaf-deep">Ինչպես է աշխատում</a>
+                <a href="#templates" class="hover:text-leaf-deep">Դիզայններ</a>
+                <a href="#contact" class="hover:text-leaf-deep">Կապ</a>
+            </nav>
+            <a
+                href="/admin"
+                class="inline-flex items-center justify-center rounded-full bg-leaf px-4 py-1.5 text-xs font-medium text-white shadow-sm shadow-leaf/40 hover:bg-leaf-deep"
+            >
+                Մուտք LoveLeaf Admin
+            </a>
+        </div>
+    </header>
+
+    {{-- Hero --}}
+    <main class="mx-auto max-w-6xl px-4 py-10">
+        <section class="grid gap-10 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] items-center">
+            <div>
+                <p class="text-xs font-semibold uppercase tracking-[0.3em] text-leaf-deep">
+                    LoveLeaf • Օնլայն հրավիրատոմսեր
+                </p>
+                <h1 class="mt-3 text-3xl font-display font-semibold tracking-tight text-slate-900 sm:text-4xl">
+                    Թղթային հրավիրատոմսերի փոխարեն՝
+                    <span class="text-leaf-deep">գեղեցիկ օնլայն էջ</span>
+                    ձեր սիրո պատմության համար։
+                </h1>
+                <p class="mt-4 text-sm leading-relaxed text-slate-700">
+                    LoveLeaf-ը ձեր հարսանեկան հրավիրատոմսը դարձնում է նուրբ օնլայն էջ՝
+                    գեղեցիկ դիզայնով, ծրագրով, քարտեզով և հարմար հղումով հյուրերի համար։
+                    Փոխանակ երկար տեքստեր գրել WhatsApp-ում՝ ուղարկեք մեկ գեղեցիկ հղում։
+                </p>
+
+                <div class="mt-6 flex flex-wrap gap-3">
+                    <a
+                        href="/admin"
+                        class="inline-flex items-center justify-center rounded-full bg-leaf px-5 py-2 text-xs font-medium text-white shadow-lg shadow-leaf/40 hover:bg-leaf-deep"
+                    >
+                        Ստեղծել օնլայն հրավիրատոմս
+                    </a>
+                    <a
+                        href="#templates"
+                        class="inline-flex items-center justify-center rounded-full border border-slate-300 px-4 py-2 text-xs font-medium text-slate-800 hover:bg-white"
+                    >
+                        Դիտել դիզայնների օրինակները
+                    </a>
+                </div>
+
+                <p class="mt-3 text-[11px] text-slate-500">
+                    Կարող եք ստեղծել մի քանի տարբեր հրավիրատոմս՝ տարբեր հյուրերի խմբերի համար
+                    (ընտանիք, ընկերներ, գործընկերներ և այլն)։
+                </p>
+            </div>
+
+            <div class="relative">
+                <div class="pointer-events-none absolute -left-10 -top-10 h-40 w-40 rounded-full bg-leaf-soft/60 blur-3xl"></div>
+                <div class="pointer-events-none absolute -right-10 bottom-0 h-40 w-40 rounded-full bg-gold-light/50 blur-3xl"></div>
+
+                <div class="relative rounded-3xl border border-slate-200/70 bg-white/90 p-5 shadow-2xl">
+                    <p class="text-[11px] font-semibold uppercase tracking-[0.25em] text-slate-500">
+                        Live preview · LoveLeaf
+                    </p>
+                    <div class="mt-3 rounded-2xl border border-gold-light bg-love-blush/60 p-5">
+                        <p class="text-[10px] tracking-[0.35em] uppercase text-slate-500">
+                            Օնլայն հրավիրատոմս
+                        </p>
+                        <h2 class="mt-3 font-script text-2xl text-leaf-deep">
+                            Ռուբեն &amp; Նոննա
+                        </h2>
+                        <p class="mt-1 text-[11px] tracking-[0.25em] uppercase text-slate-600">
+                            16.11.2025 • 18:00
+                        </p>
+                        <p class="mt-3 text-xs text-slate-700">
+                            Restaurant Name, Երևան<br>
+                            <span class="text-[11px] text-slate-500">
+                                Elegant / Festive dress code
+                            </span>
+                        </p>
+                    </div>
+                    <p class="mt-3 text-[11px] text-slate-500">
+                        Յուրաքանչյուր զույգ LoveLeaf-ում ստանում է նմանատիպ էջ՝ իր անուններով, ամսաթվով ու
+                        անհատական հղումով։
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        {{-- Ինչպես է աշխատում --}}
+        <section id="how" class="mt-12 border-t border-slate-200 pt-10">
+            <h2 class="text-sm font-semibold uppercase tracking-[0.25em] text-slate-700 font-display">
+                Ինչպես է աշխատում LoveLeaf
+            </h2>
+            <div class="mt-4 grid gap-4 text-sm text-slate-800 md:grid-cols-3">
+                <div class="rounded-2xl bg-white/90 p-4 border border-slate-200/70">
+                    <p class="text-xs font-semibold text-leaf-deep">Քայլ 1</p>
+                    <p class="mt-2 font-medium font-display">Ընտրեք դիզայն</p>
+                    <p class="mt-1 text-[13px] text-slate-700">
+                        Ընտրեք Elegant, Nature, Luxury կամ Pastel ոճ՝ ձեր հարսանիքի մթնոլորտին համապատասխան։
+                    </p>
+                </div>
+                <div class="rounded-2xl bg-white/90 p-4 border border-slate-200/70">
+                    <p class="text-xs font-semibold text-leaf-deep">Քայլ 2</p>
+                    <p class="mt-2 font-medium font-display">Լրացրեք ձեր տվյալները</p>
+                    <p class="mt-1 text-[13px] text-slate-700">
+                        Անուններ, ամսաթիվ, ժամ, վայր, ծրագիր, քարտեզի հղում, dress code և այլ մանրամասներ։
+                    </p>
+                </div>
+                <div class="rounded-2xl bg-white/90 p-4 border border-slate-200/70">
+                    <p class="text-xs font-semibold text-leaf-deep">Քայլ 3</p>
+                    <p class="mt-2 font-medium font-display">Ուղարկեք հյուրերին</p>
+                    <p class="mt-1 text-[13px] text-slate-700">
+                        Ստանում եք գեղեցիկ հղում, որը կարող եք ուղարկել WhatsApp, Telegram կամ SMS-ով։
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        {{-- Դիզայնների օրինակներ --}}
+        <section id="templates" class="mt-12 border-t border-slate-200 pt-10">
+            <h2 class="text-sm font-semibold uppercase tracking-[0.25em] text-slate-700 font-display">
+                LoveLeaf դիզայնների հավաքածու
+            </h2>
+            <p class="mt-2 text-sm text-slate-700">
+                Հիմնական 4 ոճ, որոնք կարող են հարմարեցվել ձեր հարսանիքի թեմային։
+            </p>
+
+            <div class="mt-5 grid gap-4 md:grid-cols-4 text-[13px]">
+                <div class="rounded-2xl bg-white/90 p-4 border border-gold-light/70">
+                    <p class="text-xs font-semibold text-gold-dark">Elegant Minimal</p>
+                    <p class="mt-1 text-slate-700">
+                        Մաքուր սպիտակ ֆոն, նուրբ տեքստ և ոսկեգույն շեշտեր։
+                    </p>
+                </div>
+                <div class="rounded-2xl bg-white/90 p-4 border border-leaf-soft/80">
+                    <p class="text-xs font-semibold text-leaf-deep">Nature Green</p>
+                    <p class="mt-1 text-slate-700">
+                        Բնության մոտիվներ, կանաչ նուրբ գույներ, Տավուշյան տրամադրություն։
+                    </p>
+                </div>
+                <div class="rounded-2xl bg-slate-950 p-4 border border-gold-dark">
+                    <p class="text-xs font-semibold text-gold-light">Luxury Black &amp; Gold</p>
+                    <p class="mt-1 text-slate-200">
+                        Մուգ ֆոն, ոսկեգույն դետալներ, պրեմիում զգացողություն։
+                    </p>
+                </div>
+                <div class="rounded-2xl bg-love-blush/80 p-4 border border-pink-200/70">
+                    <p class="text-xs font-semibold text-pink-600">Romantic Pastel</p>
+                    <p class="mt-1 text-slate-700">
+                        Պաստելային վարդագույն, նուրբ և ռոմանտիկ մթնոլորտ։
+                    </p>
+                </div>
+            </div>
+
+            <p class="mt-3 text-[11px] text-slate-500">
+                Հնարավոր է ստեղծել նաև լրիվ անհատական դիզայն՝ ըստ ձեր հարսանիքի կոնցեպտի։
+            </p>
+        </section>
+
+        {{-- Կապ / համագործակցություն --}}
+        <section id="contact" class="mt-12 border-t border-slate-200 pt-10">
+            <h2 class="text-sm font-semibold uppercase tracking-[0.25em] text-slate-700 font-display">
+                Պատվերներ և համագործակցություն
+            </h2>
+            <p class="mt-2 text-sm text-slate-700">
+                Կարող եք ինքնուրույն ստեղծել հրավիրատոմս LoveLeaf Admin-ում, կամ գրել մեզ, և մենք ամեն ինչը կանենք ձեր փոխարեն։
+            </p>
+
+            <div class="mt-4 flex flex-wrap gap-3 text-xs text-slate-800">
+                <a
+                    href="/admin"
+                    class="inline-flex items-center justify-center rounded-full bg-leaf px-5 py-2 font-medium text-white shadow-lg shadow-leaf/40 hover:bg-leaf-deep"
+                >
+                    Մուտք LoveLeaf Admin / փորձել
+                </a>
+                <a
+                    href="https://t.me/your_username_here"
+                    target="_blank"
+                    class="inline-flex items-center justify-center rounded-full border border-slate-300 px-4 py-2 font-medium hover:bg-white"
+                >
+                    Գրել Telegram-ով
+                </a>
+                <span class="text-[11px] text-slate-500">
+                    Գրեք, և մենք կառաջարկենք տարբերակ՝ ըստ ձեր բյուջեի և նախասիրությունների։
+                </span>
+            </div>
+        </section>
+    </main>
+
+    <footer class="mt-10 border-t border-slate-200 py-4">
+        <div class="mx-auto flex max-w-6xl items-center justify-between px-4 text-[11px] text-slate-500">
+            <span>© {{ date('Y') }} LoveLeaf • Online Wedding Invites</span>
+            <span>Ստեղծված սիրով 🌿</span>
+        </div>
+    </footer>
+</div>
+</body>
+</html>

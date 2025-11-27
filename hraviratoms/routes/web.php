@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\PublicInvitationController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -14,5 +14,14 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('home');
-});
+    return view('landing');
+})->name('landing');
+
+
+Route::get('/admin/{any?}', function () {
+    return view('admin');
+})->where('any', '.*');
+
+
+Route::get('/i/{slug}', [PublicInvitationController::class, 'show'])
+    ->name('invitation.public.show');

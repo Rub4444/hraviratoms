@@ -1,19 +1,14 @@
 <?php
-
-use Illuminate\Http\Request;
+use App\Http\Controllers\Api\InvitationTemplateController;
+use App\Http\Controllers\Api\InvitationController;
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "api" middleware group. Make something great!
-|
-*/
+Route::get('/templates', [InvitationTemplateController::class, 'index']);
+Route::get('/templates/{key}', [InvitationTemplateController::class, 'show']);
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
+Route::get('/invitations', [InvitationController::class, 'index']);
+Route::post('/invitations', [InvitationController::class, 'store']);
+Route::get('/invitations/{invitation}', [InvitationController::class, 'show']);
+Route::put('/invitations/{invitation}', [InvitationController::class, 'update']);
+Route::delete('/invitations/{invitation}', [InvitationController::class, 'destroy']);
+
