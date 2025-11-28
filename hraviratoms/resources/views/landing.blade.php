@@ -71,13 +71,18 @@
                 <a href="#faq" class="hover:text-leaf-deep">FAQ</a>
                 <a href="#contact" class="hover:text-leaf-deep">Կապ</a>
             </nav>
+            @auth
+                @if(auth()->user()->is_superadmin)
+                    <a
+                        href="/admin"
+                        class="inline-flex items-center justify-center rounded-full bg-leaf px-4 py-1.5 text-xs font-medium text-white shadow-sm shadow-leaf/40 hover:bg-leaf-deep"
+                    >
+                        Մուտք LoveLeaf Admin
+                    </a>
+                @endif
+            @endauth
 
-            <a
-                href="/admin"
-                class="inline-flex items-center justify-center rounded-full bg-leaf px-4 py-1.5 text-xs font-medium text-white shadow-sm shadow-leaf/40 hover:bg-leaf-deep"
-            >
-                Մուտք LoveLeaf Admin
-            </a>
+
         </div>
     </header>
 
