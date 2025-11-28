@@ -32,27 +32,32 @@ class InvitationController extends Controller
     {
         $user = auth()->user();
 
-        // Суперадмин — видит всё
         if ($user->is_superadmin) {
-            return Invitation::with('template')
+            return Invitation::with(['template', 'user'])
                 ->orderByDesc('created_at')
                 ->get();
         }
 
-        // Обычный юзер — только свои
-        return Invitation::with('template')
+        return Invitation::with(['template', 'user'])
             ->where('user_id', $user->id)
             ->orderByDesc('created_at')
             ->get();
     }
 
+
     public function show(Invitation $invitation)
     {
         $this->ensureCanAccessInvitation($invitation);
 
-        $invitation->load('template', 'guests'); // или rsvps
+        if (method_exists($invitation, 'trashed') && $invitation->trashed()) {
+            abort(404);
+        }
+
+        $invitation->load('template', 'guests', 'user'); // или rsvps
+
         return $invitation;
     }
+
 
     public function store(Request $request)
     {

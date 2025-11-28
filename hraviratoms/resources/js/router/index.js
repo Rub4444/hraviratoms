@@ -4,6 +4,7 @@ const TemplatesListView = () => import('../views/TemplatesListView.vue');
 const InvitationsListView = () => import('../views/InvitationsListView.vue');
 const InvitationFormView = () => import('../views/InvitationFormView.vue');
 const InvitationRsvpListView = () => import('../views/InvitationRsvpListView.vue');
+const UsersListView = () => import('../views/UsersListView.vue');
 
 const routes = [
     {
@@ -33,6 +34,12 @@ const routes = [
         name: 'invitations.rsvps',
         component: InvitationRsvpListView,
         props: true,
+    },
+    {
+        path: '/users',
+        name: 'users.index',
+        component: UsersListView,
+        meta: { requiresAuth: true },
     },
 ];
 

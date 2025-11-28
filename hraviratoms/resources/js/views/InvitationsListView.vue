@@ -35,6 +35,7 @@
           <tr>
             <th class="px-4 py-3">Couple</th>
             <th class="px-4 py-3">Template</th>
+             <th class="px-4 py-3">Owner</th>
             <th class="px-4 py-3">Date</th>
             <th class="px-4 py-3">Published</th>
             <th class="px-4 py-3">Link</th>
@@ -59,6 +60,9 @@
               {{ invitation.template?.name || '—' }}
             </td>
             <td class="px-4 py-3 align-top text-xs text-slate-600">
+                {{ invitation.user?.name || 'Superadmin only' }}
+            </td>
+            <td class="px-4 py-3 align-top text-xs text-slate-600">
               <span v-if="invitation.date">
                 {{ formatDate(invitation.date) }}
               </span>
@@ -80,7 +84,7 @@
             </td>
             <td class="px-4 py-3 align-top text-xs">
               <div class="max-w-[200px] truncate text-slate-600">
-                {{ getPublicUrl(invitation) }}
+                {{ invitation.slug }}
               </div>
               <button
                 class="mt-1 text-[11px] text-rose-500 hover:text-rose-600"
@@ -93,6 +97,7 @@
             <td class="px-4 py-3 align-top text-right text-xs">
                 <div class="flex flex-wrap justify-end gap-2">
                     <a
+                    v-if="isSuperAdmin"
                     :href="getPublicUrl(invitation)"
                     target="_blank"
                     class="rounded-full border border-slate-200 px-3 py-1 font-medium hover:bg-slate-50"
@@ -101,6 +106,7 @@
                     </a>
 
                     <button
+                    v-if="isSuperAdmin"
                     class="rounded-full bg-slate-900 px-3 py-1 font-medium text-white hover:bg-slate-800"
                     type="button"
                     @click="$router.push({ name: 'invitations.edit', params: { id: invitation.id } })"
@@ -117,6 +123,7 @@
                     </button>
 
                     <button
+                    v-if="isSuperAdmin"
                     class="rounded-full bg-red-500 px-3 py-1 font-medium text-white hover:bg-red-600"
                     type="button"
                     @click="deleteInvitation(invitation)"
@@ -140,9 +147,16 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 
+const isSuperAdmin =
+  document.querySelector('meta[name="superadmin"]')?.getAttribute('content') === '1';
+
 const invitations = ref([]);
 const loading = ref(true);
 const error = ref('');
+
+// ⬇ 1. CSRF-токен — ОДИН РАЗ, наверху
+const csrfToken =
+  document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
 
 const fetchInvitations = async () => {
   loading.value = true;
@@ -171,7 +185,6 @@ const copyLink = async (invitation) => {
     await navigator.clipboard.writeText(url);
     alert('Link copied!');
   } catch {
-    // fallback
     prompt('Copy this link:', url);
   }
 };
@@ -196,11 +209,17 @@ const deleteInvitation = async (invitation) => {
   try {
     const res = await fetch(`/api/invitations/${invitation.id}`, {
       method: 'DELETE',
+      headers: {
+        'X-CSRF-TOKEN': csrfToken,          // ⬅ теперь переменная доступна
+        'Accept': 'application/json',
+      },
     });
 
-    if (!res.ok) throw new Error('Failed to delete invitation');
+    if (!res.ok) {
+      console.error('Delete error status:', res.status);
+      throw new Error('Failed to delete invitation');
+    }
 
-    // Удаляем из списка на фронте
     invitations.value = invitations.value.filter((i) => i.id !== invitation.id);
 
     alert('Invitation deleted');
@@ -212,3 +231,4 @@ const deleteInvitation = async (invitation) => {
 
 onMounted(fetchInvitations);
 </script>
+

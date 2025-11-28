@@ -47,7 +47,11 @@ Route::middleware('auth')->group(function () {
     // Admin API (для Vue) — доступен только после логина
     Route::prefix('api')->group(function () {
 
+        // Пользователи (только для супер-админа)
         Route::get('/users', [UserController::class, 'index']);
+        Route::post('/users', [UserController::class, 'store']);
+        Route::put('/users/{user}', [UserController::class, 'update']);
+        Route::delete('/users/{user}', [UserController::class, 'destroy']);
 
         // Шаблоны приглашений
         Route::get('/templates', [InvitationTemplateController::class, 'index']);
@@ -60,7 +64,8 @@ Route::middleware('auth')->group(function () {
         Route::put('/invitations/{invitation}', [InvitationController::class, 'update']);
         Route::delete('/invitations/{invitation}', [InvitationController::class, 'destroy']);
 
-        // RSVP-статистика по приглашению
+        // RSVP-статистика
         Route::get('/invitations/{invitation}/rsvps', [InvitationRsvpController::class, 'index']);
     });
+
 });

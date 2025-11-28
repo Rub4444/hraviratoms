@@ -6,33 +6,33 @@
     <p class="mb-5 text-sm text-slate-600">
       {{ templateTitle }}
     </p>
-    <div
-    v-if="users.length"
-    class="col-span-2"
-    >
-        <label class="block text-[11px] font-medium text-slate-600 mb-1">
-            Кто может видеть статистику (владелец)
-        </label>
-        <select
-            v-model="form.user_id"
-            class="mt-1 block w-full rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-leaf focus:ring-leaf"
-        >
-            <option :value="null">
-            Только супер-админ (не привязано к аккаунту)
-            </option>
-            <option
-            v-for="u in users"
-            :key="u.id"
-            :value="u.id"
-            >
-            {{ u.name }} ({{ u.email }}) <span v-if="u.is_superadmin">— Superadmin</span>
-            </option>
-        </select>
-    </div>
     <div class="grid gap-6 md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
       <!-- Форма -->
       <form class="space-y-4" @submit.prevent="handleSubmit">
         <div class="grid gap-4 md:grid-cols-2">
+            <div
+            v-if="users.length"
+            class="col-span-2"
+            >
+            <label class="block text-[11px] font-medium text-slate-600 mb-1">
+                Кто может видеть статистику (владелец)
+            </label>
+            <select
+                v-model="form.user_id"
+                class="mt-1 block w-full rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-leaf focus:ring-leaf"
+            >
+                <option :value="null">
+                Только супер-админ (не привязано к аккаунту)
+                </option>
+                <option
+                v-for="u in users"
+                :key="u.id"
+                :value="u.id"
+                >
+                {{ u.name }} ({{ u.email }}) <span v-if="u.is_superadmin">— Superadmin</span>
+                </option>
+            </select>
+        </div>
           <div>
             <label class="block text-xs font-medium text-slate-700">Bride name</label>
             <input
@@ -195,6 +195,10 @@ import { useRoute, useRouter } from 'vue-router';
 const route = useRoute();
 const router = useRouter();
 
+const csrfToken =
+  document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+
+
 const props = defineProps({
   id: {
     type: String,
@@ -263,6 +267,8 @@ const addProgramItem = () => {
 };
 
 onMounted(async () => {
+
+  await fetchUsers();
   try {
     if (isEdit.value && props.id) {
       // режим редактирования
@@ -324,7 +330,10 @@ const handleSubmit = async () => {
     const res = await fetch(url, {
       method,
       headers: {
+        'X-CSRF-TOKEN': csrfToken,
+        'X-Requested-With': 'XMLHttpRequest',
         'Content-Type': 'application/json',
+        'Accept': 'application/json',
       },
       body: JSON.stringify(payload),
     });

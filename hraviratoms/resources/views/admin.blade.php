@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <title>Wedding Invites Admin</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="superadmin" content="{{ auth()->user()->is_superadmin ? '1' : '0' }}">
+
     @vite('resources/js/app.js')
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
