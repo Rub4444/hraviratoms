@@ -94,7 +94,7 @@
             </div>
         @endif
 
-        <form method="POST" action="{{ route('invitation.public.rsvp', $invitation->slug) }}" class="grid gap-3 text-left md:grid-cols-2">
+        <form @if(!isset($isDemo) || !$isDemo) method="POST"  action="{{ route('invitation.public.rsvp', $invitation->slug) }}"  @else action="{{ route('landing') }}" @endif class="grid gap-3 text-left md:grid-cols-2">
             @csrf
 
             <div class="md:col-span-2">
@@ -200,7 +200,6 @@
                     <p class="mt-1 text-[11px] text-red-500">{{ $message }}</p>
                 @enderror
             </div>
-
             <div class="md:col-span-2 flex justify-end">
                 <button
                     type="submit"
