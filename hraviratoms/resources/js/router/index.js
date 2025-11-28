@@ -5,6 +5,7 @@ const InvitationsListView = () => import('../views/InvitationsListView.vue');
 const InvitationFormView = () => import('../views/InvitationFormView.vue');
 const InvitationRsvpListView = () => import('../views/InvitationRsvpListView.vue');
 const UsersListView = () => import('../views/UsersListView.vue');
+const ForbiddenView = () => import('../views/ForbiddenView.vue');
 
 const routes = [
     {
@@ -41,6 +42,12 @@ const routes = [
         component: UsersListView,
         meta: { requiresAuth: true },
     },
+    {
+        path: '/forbidden',
+        name: 'forbidden',
+        component: () => ForbiddenView,
+    },
+
 ];
 
 const router = createRouter({

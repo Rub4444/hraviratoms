@@ -210,8 +210,34 @@
                 </button>
             </div>
         </form>
+        @if(isset($isDemo) && $isDemo)
+            <div class="mt-10 text-center">
+                <div class="inline-block rounded-2xl border border-leaf-soft bg-white/60 px-6 py-4 shadow-sm backdrop-blur">
+                    <p class="text-[13px] text-slate-700 font-medium">
+                        Ցանկանու՞մ եք նման օնլայն հրավիրատոմս ձեր հարսանիքի համար։
+                    </p>
+                    <p class="mt-1 text-[13px] text-slate-600">
+                        Կապ հաստատեք մեզ հետ WhatsApp կամ Viber միջոցով․
+                    </p>
+
+                    <div class="mt-3 flex justify-center gap-3">
+                        <a href="https://wa.me/374XXXXXXXX"
+                        class="rounded-full bg-green-500 px-4 py-1.5 text-xs font-medium text-white hover:bg-green-600 transition">
+                        WhatsApp
+                        </a>
+
+                        <a href="viber://chat?number=374XXXXXXXX"
+                        class="rounded-full bg-purple-500 px-4 py-1.5 text-xs font-medium text-white hover:bg-purple-600 transition">
+                        Viber
+                        </a>
+                    </div>
+                </div>
+            </div>
+        @endif
     </div>
 </div>
+
+
 </body>
 </html>
 

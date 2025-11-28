@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\InvitationTemplateController;
 use App\Http\Controllers\Api\InvitationController;
 use App\Http\Controllers\InvitationRsvpController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\DemoInvitationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,6 +26,9 @@ Route::get('/i/{slug}', [PublicInvitationController::class, 'show'])
 
 Route::post('/i/{slug}/rsvp', [PublicInvitationController::class, 'submitRsvp'])
     ->name('invitation.public.rsvp');
+
+Route::get('/demo/{key}', [DemoInvitationController::class, 'show'])
+    ->name('demo.show');
 
 // Аутентификация
 Route::get('/login', [AuthController::class, 'showLoginForm'])
@@ -47,22 +51,22 @@ Route::middleware('auth')->group(function () {
     // Admin API (для Vue) — доступен только после логина
     Route::prefix('api')->group(function () {
 
-        // Пользователи (только для супер-админа)
-        Route::get('/users', [UserController::class, 'index']);
-        Route::post('/users', [UserController::class, 'store']);
-        Route::put('/users/{user}', [UserController::class, 'update']);
-        Route::delete('/users/{user}', [UserController::class, 'destroy']);
+        Route::middleware('admin')->group(function ()
+        {
+            Route::get('/users', [UserController::class, 'index']);
+            Route::post('/users', [UserController::class, 'store']);
+            Route::put('/users/{user}', [UserController::class, 'update']);
+            Route::delete('/users/{user}', [UserController::class, 'destroy']);
 
-        // Шаблоны приглашений
-        Route::get('/templates', [InvitationTemplateController::class, 'index']);
-        Route::get('/templates/{key}', [InvitationTemplateController::class, 'show']);
+            Route::get('/templates', [InvitationTemplateController::class, 'index']);
+            Route::get('/templates/{key}', [InvitationTemplateController::class, 'show']);
 
-        // Приглашения
-        Route::get('/invitations', [InvitationController::class, 'index']);
-        Route::post('/invitations', [InvitationController::class, 'store']);
-        Route::get('/invitations/{invitation}', [InvitationController::class, 'show']);
-        Route::put('/invitations/{invitation}', [InvitationController::class, 'update']);
-        Route::delete('/invitations/{invitation}', [InvitationController::class, 'destroy']);
+            Route::get('/invitations', [InvitationController::class, 'index']);
+            Route::post('/invitations', [InvitationController::class, 'store']);
+            Route::get('/invitations/{invitation}', [InvitationController::class, 'show']);
+            Route::put('/invitations/{invitation}', [InvitationController::class, 'update']);
+            Route::delete('/invitations/{invitation}', [InvitationController::class, 'destroy']);
+        });
 
         // RSVP-статистика
         Route::get('/invitations/{invitation}/rsvps', [InvitationRsvpController::class, 'index']);

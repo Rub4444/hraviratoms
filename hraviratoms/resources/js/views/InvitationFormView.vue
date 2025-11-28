@@ -273,7 +273,7 @@ onMounted(async () => {
     if (isEdit.value && props.id) {
       // режим редактирования
       const res = await fetch(`/api/invitations/${props.id}`);
-      if (!res.ok) throw new Error('Failed to load invitation');
+      if (!res.ok) {return [];}
 
       const data = await res.json();
       template.value = data.template;
@@ -352,7 +352,6 @@ const handleSubmit = async () => {
 
     router.push({ name: 'invitations.index' });
   } catch (e) {
-    console.error(e);
     error.value = e.message || 'Error saving invitation';
   } finally {
     submitting.value = false;

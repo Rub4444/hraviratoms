@@ -154,26 +154,9 @@ const invitations = ref([]);
 const loading = ref(true);
 const error = ref('');
 
-// ⬇ 1. CSRF-токен — ОДИН РАЗ, наверху
+// CSRF-токен (для DELETE)
 const csrfToken =
   document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
-
-const fetchInvitations = async () => {
-  loading.value = true;
-  error.value = '';
-
-  try {
-    const res = await fetch('/api/invitations');
-    if (!res.ok) throw new Error('Failed to load invitations');
-
-    invitations.value = await res.json();
-  } catch (e) {
-    console.error(e);
-    error.value = e.message || 'Error loading invitations';
-  } finally {
-    loading.value = false;
-  }
-};
 
 const getPublicUrl = (invitation) => {
   return `${window.location.origin}/i/${invitation.slug}`;
@@ -199,6 +182,44 @@ const formatDate = (value) => {
   }
 };
 
+const fetchInvitations = async () => {
+  loading.value = true;
+  error.value = '';
+
+  try {
+    const res = await fetch('/api/invitations', {
+      headers: {
+        Accept: 'application/json',
+      },
+    });
+
+    if (res.status === 403) {
+      // нет прав — просто показываем пустой список без ошибок в консоли
+      invitations.value = [];
+      return;
+    }
+
+    if (!res.ok) {
+      // неожиданная ошибка → можно тихо показать текст пользователю
+      error.value = 'Не удалось загрузить приглашения';
+      invitations.value = [];
+      // НИЧЕГО не кидаем, чтобы не было Uncaught в консоли
+      return;
+    }
+
+    invitations.value = await res.json();
+  } catch (e) {
+    // на проде можно вообще убрать console.error
+    if (import.meta.env.DEV) {
+      console.error('fetchInvitations error', e);
+    }
+    error.value = 'Ошибка при загрузке приглашений';
+    invitations.value = [];
+  } finally {
+    loading.value = false;
+  }
+};
+
 const deleteInvitation = async (invitation) => {
   const confirmed = confirm(
     `Удалить приглашение для пары "${invitation.bride_name} & ${invitation.groom_name}"?`
@@ -210,25 +231,30 @@ const deleteInvitation = async (invitation) => {
     const res = await fetch(`/api/invitations/${invitation.id}`, {
       method: 'DELETE',
       headers: {
-        'X-CSRF-TOKEN': csrfToken,          // ⬅ теперь переменная доступна
-        'Accept': 'application/json',
+        'X-CSRF-TOKEN': csrfToken,
+        Accept: 'application/json',
       },
     });
 
     if (!res.ok) {
-      console.error('Delete error status:', res.status);
-      throw new Error('Failed to delete invitation');
+      if (import.meta.env.DEV) {
+        console.warn('Delete error status:', res.status);
+      }
+      alert('Failed to delete invitation');
+      return;
     }
 
     invitations.value = invitations.value.filter((i) => i.id !== invitation.id);
-
     alert('Invitation deleted');
   } catch (e) {
-    console.error(e);
+    if (import.meta.env.DEV) {
+      console.error(e);
+    }
     alert('Error deleting invitation');
   }
 };
 
 onMounted(fetchInvitations);
 </script>
+
 
