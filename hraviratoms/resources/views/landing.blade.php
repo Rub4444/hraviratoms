@@ -198,49 +198,24 @@
             </p>
 
             <div class="mt-5 grid gap-4 md:grid-cols-4 text-[13px]">
-                <a href="{{ route('demo.show', 'elegant-minimal') }}" target="_blank"
-                class="rounded-2xl bg-white/90 p-4 border border-gold-light/70 hover:border-gold-dark hover:shadow-md transition">
-                    <p class="text-xs font-semibold text-gold-dark">Elegant Minimal</p>
-                    <p class="mt-1 text-slate-700">
-                        Մաքուր սպիտակ ֆոն, նուրբ տեքստ և ոսկեգույն շեշտեր։
-                    </p>
-                    <p class="mt-2 text-[11px] text-gold-dark underline">
-                        Դիտել կենդանի օրինակը
-                    </p>
-                </a>
+                @foreach ($templates as $template)
+                    <a href="{{ route('demo.show', $template->key) }}"
+                    target="_blank"
+                    class="{{ $template->card_class }}">
 
-                <a href="{{ route('demo.show', 'nature-green') }}" target="_blank"
-                class="rounded-2xl bg-white/90 p-4 border border-leaf-soft/80 hover:border-leaf-deep hover:shadow-md transition">
-                    <p class="text-xs font-semibold text-leaf-deep">Nature Green</p>
-                    <p class="mt-1 text-slate-700">
-                        Բնության մոտիվներ, կանաչ նուրբ գույներ, Տավուշյան տրամադրություն։
-                    </p>
-                    <p class="mt-2 text-[11px] text-leaf-deep underline">
-                        Դիտել կենդանի օրինակը
-                    </p>
-                </a>
+                        <p class="{{ $template->title_class }}">
+                            {{ $template->name }}
+                        </p>
 
-                <a href="{{ route('demo.show', 'luxury-black-gold') }}" target="_blank"
-                class="rounded-2xl bg-slate-950 p-4 border border-gold-dark hover:shadow-md transition">
-                    <p class="text-xs font-semibold text-gold-light">Luxury Black &amp; Gold</p>
-                    <p class="mt-1 text-slate-200">
-                        Մուգ ֆոն, ոսկեգույն դետալներ, պրեմիում զգացողություն։
-                    </p>
-                    <p class="mt-2 text-[11px] text-gold-light underline">
-                        Դիտել կենդանի օրինակը
-                    </p>
-                </a>
+                        <p class="{{ $template->desc_class }}">
+                            {{ $template->description }}
+                        </p>
 
-                <a href="{{ route('demo.show', 'romantic-pastel') }}" target="_blank"
-                class="rounded-2xl bg-love-blush/80 p-4 border border-pink-200/70 hover:border-pink-400 hover:shadow-md transition">
-                    <p class="text-xs font-semibold text-pink-600">Romantic Pastel</p>
-                    <p class="mt-1 text-slate-700">
-                        Պաստելային վարդագույն, նուրբ և ռոմանտիկ մթնոլորտ։
-                    </p>
-                    <p class="mt-2 text-[11px] text-pink-600 underline">
-                        Դիտել կենդանի օրինակը
-                    </p>
-                </a>
+                        <p class="{{ $template->link_class }}">
+                            Դիտել կենդանի օրինակը
+                        </p>
+                    </a>
+                @endforeach
             </div>
 
 

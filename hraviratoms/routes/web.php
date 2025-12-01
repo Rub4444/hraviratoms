@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\InvitationController;
 use App\Http\Controllers\InvitationRsvpController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\DemoInvitationController;
+use App\Http\Controllers\HomeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,9 +17,8 @@ use App\Http\Controllers\DemoInvitationController;
 */
 
 // Главная LoveLeaf
-Route::get('/', function () {
-    return view('landing');
-})->name('landing');
+Route::get('/', [HomeController::class, 'index'])
+    ->name('landing');
 
 // Публичные приглашения + RSVP
 Route::get('/i/{slug}', [PublicInvitationController::class, 'show'])

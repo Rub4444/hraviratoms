@@ -96,6 +96,58 @@ class InvitationController extends Controller
         return response()->json($invitation->fresh('template'), 201);
     }
 
+    public function publicStoreRequest(Request $request)
+    {
+        // гость или залогиненный пользователь — неважно
+        // никакой superadmin проверки!
+
+        $data = $request->validate([
+            'invitation_template_id' => ['required', 'exists:invitation_templates,id'],
+            'bride_name'    => ['required', 'string', 'max:255'],
+            'groom_name'    => ['required', 'string', 'max:255'],
+            'date'          => ['nullable', 'date'],
+            'time'          => ['nullable', 'string', 'max:50'],
+            'venue_name'    => ['nullable', 'string', 'max:255'],
+            'venue_address' => ['nullable', 'string', 'max:255'],
+            'dress_code'    => ['nullable', 'string', 'max:255'],
+            'data'          => ['nullable', 'array'],
+
+            // поля клиента
+            'customer_name'   => ['required', 'string', 'max:255'],
+            'customer_email'  => ['nullable', 'email'],
+            'customer_phone'  => ['nullable', 'string', 'max:50'],
+            'customer_comment'=> ['nullable', 'string'],
+        ]);
+
+        // Генерируем slug точно так же, как в store()
+        $data['slug'] = Str::slug(
+            ($data['bride_name'] ?? '') . '-' .
+            ($data['groom_name'] ?? '') . '-' .
+            ($data['date'] ?? now()->format('Y-m-d'))
+        ) . '-' . Str::random(5);
+
+        // ОБЯЗАТЕЛЬНО: статус pending
+        $data['status'] = Invitation::STATUS_PENDING;
+
+        // создаём приглашение
+        $invitation = Invitation::create($data);
+
+        // отправка письма админу
+        // if ($adminEmail = config('mail.from.address')) {
+        //     Mail::raw(
+        //         "НОВАЯ ЗАЯВКА #{$invitation->id}\n".
+        //         "Клиент: {$invitation->customer_name}\n".
+        //         "Email: {$invitation->customer_email}\n".
+        //         "Телефон: {$invitation->customer_phone}\n",
+        //         fn($msg) => $msg->to($adminEmail)->subject("LoveLeaf: новая заявка")
+        //     );
+        // }
+
+        return response()->json([
+            'ok' => true,
+            'message' => 'Ձեր հարցումը հաջողությամբ ուղարկվեց։'
+        ], 201);
+    }
 
 
     public function update(Request $request, Invitation $invitation)

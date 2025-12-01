@@ -11,6 +11,10 @@ class Invitation extends Model
 {
     use SoftDeletes;
 
+    const STATUS_PENDING   = 'pending';
+    const STATUS_PUBLISHED = 'published';
+    const STATUS_REJECTED  = 'rejected';
+
     protected $fillable = [
         'invitation_template_id',
         'user_id',
@@ -27,6 +31,11 @@ class Invitation extends Model
         'is_published',
         'meta_title',
         'meta_description',
+        'status',
+        'customer_name',
+        'customer_email',
+        'customer_phone',
+        'customer_comment',
     ];
 
     protected $casts = [
@@ -34,6 +43,16 @@ class Invitation extends Model
         'date' => 'date',
         'is_published' => 'boolean',
     ];
+
+    public function scopePublished($query)
+    {
+        return $query->where('status', self::STATUS_PUBLISHED);
+    }
+
+    public function scopePending($query)
+    {
+        return $query->where('status', self::STATUS_PENDING);
+    }
 
     public function template(): BelongsTo
     {

@@ -14,10 +14,21 @@ class InvitationTemplate extends Model
         'preview_image',
         'vue_component',
         'is_active',
+        'card_class',
+        'title_class',
+        'desc_class',
+        'link_class',
     ];
 
     public function invitations(): HasMany
     {
         return $this->hasMany(Invitation::class);
     }
+
+    public static function findActiveOrFail($id)
+    {
+        return self::where('is_active', true)
+            ->findOrFail($id);
+    }
+
 }

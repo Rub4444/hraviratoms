@@ -229,6 +229,7 @@
                         class="rounded-full bg-purple-500 px-4 py-1.5 text-xs font-medium text-white hover:bg-purple-600 transition">
                         Viber
                         </a>
+
                     </div>
                 </div>
             </div>
