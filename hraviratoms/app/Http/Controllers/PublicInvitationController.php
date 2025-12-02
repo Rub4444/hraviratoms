@@ -139,8 +139,9 @@ class PublicInvitationController extends Controller
 
         $to = env('ADMIN_NOTIFICATION_EMAIL') ?: config('mail.from.address');
 
-        if ($to) {
-            Mail::to($to)->send(new InvitationCreatedNotification($invitation, true));
+        if ($to)
+        {
+            Mail::to($to)->queue(new InvitationCreatedNotification($invitation, true));
         }
 
 
