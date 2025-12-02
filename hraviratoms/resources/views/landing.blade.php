@@ -71,13 +71,21 @@
                 <a href="#faq" class="hover:text-leaf-deep">FAQ</a>
                 <a href="#contact" class="hover:text-leaf-deep">Կապ</a>
             </nav>
+
+            <a
+                href="/login"
+                class="inline-flex items-center justify-center rounded-full bg-leaf px-4 py-1.5 text-xs font-medium text-white shadow-sm shadow-leaf/40 hover:bg-leaf-deep"
+            >
+                Մուտք LoveLeaf
+            </a>
             @auth
                 @if(auth()->user()->is_superadmin)
-                    <a
-                        href="/admin"
-                        class="inline-flex items-center justify-center rounded-full bg-leaf px-4 py-1.5 text-xs font-medium text-white shadow-sm shadow-leaf/40 hover:bg-leaf-deep"
-                    >
-                        Մուտք LoveLeaf Admin
+                    <a href="/admin" class="btn-admin">
+                        Մուտք LoveLeaf Admin (Superadmin)
+                    </a>
+                @else
+                    <a href="/admin" class="btn-admin">
+                        Մուտք LoveLeaf Invitation
                     </a>
                 @endif
             @endauth
@@ -86,8 +94,14 @@
         </div>
     </header>
 
+
     {{-- Hero --}}
     <main class="mx-auto max-w-6xl px-4 py-10">
+        @if(session('request_success'))
+            <div class="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+                {{ session('request_success') }}
+            </div>
+        @endif
         <section class="grid gap-10 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] items-center">
             <div>
                 <p class="text-xs font-semibold uppercase tracking-[0.3em] text-leaf-deep">
@@ -106,10 +120,10 @@
 
                 <div class="mt-6 flex flex-wrap gap-3">
                     <a
-                        href="/admin"
+                        href="{{ route('invitation.request.form') }}"
                         class="inline-flex items-center justify-center rounded-full bg-leaf px-5 py-2 text-xs font-medium text-white shadow-lg shadow-leaf/40 hover:bg-leaf-deep"
                     >
-                        Ստեղծել օնլայն հրավիրատոմս
+                        Պատվիրել իմ օնլայն հրավիրատոմսը
                     </a>
                     <a
                         href="#templates"

@@ -6,6 +6,19 @@
     <p class="mb-5 text-sm text-slate-600">
       {{ templateTitle }}
     </p>
+    <button
+    type="button"
+    class="btn-secondary text-xs"
+    :disabled="loadingUser || !isEdit"
+    @click="handleCreateUser"
+    >
+    {{ loadingUser ? 'Creating user...' : 'Add user' }}
+    </button>
+
+    <p v-if="errorUser" class="mt-1 text-[11px] text-red-500">
+    {{ errorUser }}
+    </p>
+
     <div class="grid gap-6 md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
       <!-- Форма -->
       <form class="space-y-4" @submit.prevent="handleSubmit">
@@ -191,9 +204,14 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import axios from 'axios';
+
 
 const route = useRoute();
 const router = useRouter();
+
+const loadingUser = ref(false)
+const errorUser = ref(null)
 
 const csrfToken =
   document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
@@ -234,6 +252,41 @@ const form = ref({
 
 const users = ref([]);
 const loadingUsers = ref(false);
+
+const handleCreateUser = async () => {
+  // Кнопка нужна только в режиме редактирования
+  if (!isEdit.value || !props.id) {
+    errorUser.value = 'Пользователя можно добавить только для уже созданного приглашения';
+    return;
+  }
+
+  try {
+    loadingUser.value = true;
+    errorUser.value = null;
+
+    const response = await axios.post(
+      `/api/invitations/${props.id}/create-user`
+    );
+
+    const data = response.data;
+
+    if (data.user) {
+      // Привязали пользователя к приглашению → выставляем user_id в форме
+      form.value.user_id = data.user.id;
+
+      // Можно показать alert или toast
+      alert(`User created/attached: ${data.user.email}`);
+    } else if (data.message) {
+      errorUser.value = data.message;
+    }
+  } catch (e) {
+    errorUser.value =
+      e.response?.data?.message || 'Ошибка при создании/привязке пользователя';
+  } finally {
+    loadingUser.value = false;
+  }
+};
+
 
 const fetchUsers = async () => {
   loadingUsers.value = true;

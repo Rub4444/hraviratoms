@@ -81,6 +81,63 @@ class UserController extends Controller
         return $user;
     }
 
+    public function createFromInvitation(Invitation $invitation)
+    {
+        $this->ensureSuperadmin();
+
+        // Если уже есть пользователь — просто вернём его
+        if ($invitation->user_id && $invitation->user) {
+            return response()->json([
+                'ok'         => false,
+                'message'    => 'У этого приглашения уже есть привязанный пользователь.',
+                'user'       => $invitation->user,
+                'invitation' => $invitation->load('user'),
+            ], 400);
+        }
+
+        // Берём данные клиента из JSON-поля "data"
+        $payload = $invitation->data ?? [];
+
+        $email = $payload['client_email'] ?? null;
+        $phone = $payload['client_phone'] ?? null;
+        $clientName = $payload['client_name'] ?? null;
+
+        if (!$email || !$phone) {
+            return response()->json([
+                'ok'      => false,
+                'message' => 'В данных заявки (data) нет email или телефона клиента.',
+            ], 422);
+        }
+
+        // Имя: сначала client_name, если нет — на основе имён пары, если нет — email
+        $name = $clientName
+            ?: trim(($invitation->bride_name ?? '') . ' & ' . ($invitation->groom_name ?? ''))
+            ?: $email;
+
+        // Если пользователь с таким email уже есть — просто используем его
+        $user = User::where('email', $email)->first();
+
+        if (!$user) {
+            $user = User::create([
+                'name'     => $name,
+                'email'    => $email,
+                // пароль = телефон из формы заявки
+                'password' => Hash::make($phone),
+            ]);
+        }
+
+        // Привязываем приглашение к пользователю
+        $invitation->user_id = $user->id;
+        $invitation->save();
+
+        return response()->json([
+            'ok'         => true,
+            'user'       => $user,
+            'invitation' => $invitation->fresh('user'),
+        ]);
+    }
+
+
     public function destroy(Request $request, User $user)
     {
         $this->ensureSuperadmin();

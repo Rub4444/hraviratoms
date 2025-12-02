@@ -8,11 +8,13 @@
         </p>
       </div>
       <button
+        v-if="isSuperadmin"
         class="btn-primary"
         @click="$router.push({ name: 'templates.index' })"
-      >
+        >
         + New invitation
-      </button>
+        </button>
+
     </div>
 
     <div
@@ -26,7 +28,7 @@
       v-else-if="!invitations.length"
       class="rounded-2xl border bg-white p-4 text-sm text-slate-500 shadow-sm"
     >
-      Пока нет ни одного приглашения. Создайте новое через вкладку "Templates".
+      Пока нет ни одного приглашения.
     </div>
 
     <div v-else class="overflow-hidden rounded-2xl border bg-white shadow-sm">
@@ -153,6 +155,13 @@ const isSuperAdmin =
 const invitations = ref([]);
 const loading = ref(true);
 const error = ref('');
+
+
+const isSuperadmin = ref(
+  document
+    .querySelector('meta[name="superadmin"]')
+    ?.getAttribute('content') === '1'
+);
 
 // CSRF-токен (для DELETE)
 const csrfToken =

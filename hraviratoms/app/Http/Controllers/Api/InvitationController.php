@@ -132,16 +132,6 @@ class InvitationController extends Controller
         // создаём приглашение
         $invitation = Invitation::create($data);
 
-        // отправка письма админу
-        // if ($adminEmail = config('mail.from.address')) {
-        //     Mail::raw(
-        //         "НОВАЯ ЗАЯВКА #{$invitation->id}\n".
-        //         "Клиент: {$invitation->customer_name}\n".
-        //         "Email: {$invitation->customer_email}\n".
-        //         "Телефон: {$invitation->customer_phone}\n",
-        //         fn($msg) => $msg->to($adminEmail)->subject("LoveLeaf: новая заявка")
-        //     );
-        // }
 
         return response()->json([
             'ok' => true,

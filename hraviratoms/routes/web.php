@@ -30,6 +30,18 @@ Route::post('/i/{slug}/rsvp', [PublicInvitationController::class, 'submitRsvp'])
 Route::get('/demo/{key}', [DemoInvitationController::class, 'show'])
     ->name('demo.show');
 
+
+/**
+ * ✅ Заявка на создание приглашения
+ * GET — форма, POST — отправка заявки
+ */
+Route::get('/request-invitation/{templateKey?}', [PublicInvitationController::class, 'showRequestForm'])
+    ->name('invitation.request.form');
+
+Route::post('/request-invitation', [PublicInvitationController::class, 'submitRequest'])
+    ->name('invitation.request.submit');
+
+
 // Аутентификация
 Route::get('/login', [AuthController::class, 'showLoginForm'])
     ->name('login');
@@ -51,6 +63,9 @@ Route::middleware('auth')->group(function () {
     // Admin API (для Vue) — доступен только после логина
     Route::prefix('api')->group(function () {
 
+        Route::get('/invitations', [InvitationController::class, 'index']);
+        Route::get('/invitations/{invitation}/rsvps', [InvitationRsvpController::class, 'index']); // RSVP-статистика
+
         Route::middleware('admin')->group(function ()
         {
             Route::get('/users', [UserController::class, 'index']);
@@ -61,15 +76,16 @@ Route::middleware('auth')->group(function () {
             Route::get('/templates', [InvitationTemplateController::class, 'index']);
             Route::get('/templates/{key}', [InvitationTemplateController::class, 'show']);
 
-            Route::get('/invitations', [InvitationController::class, 'index']);
+
             Route::post('/invitations', [InvitationController::class, 'store']);
             Route::get('/invitations/{invitation}', [InvitationController::class, 'show']);
             Route::put('/invitations/{invitation}', [InvitationController::class, 'update']);
             Route::delete('/invitations/{invitation}', [InvitationController::class, 'destroy']);
-        });
 
-        // RSVP-статистика
-        Route::get('/invitations/{invitation}/rsvps', [InvitationRsvpController::class, 'index']);
+            // ✨ Новый эндпоинт: создать/привязать юзера по заявке
+            Route::post('/invitations/{invitation}/create-user', [UserController::class, 'createFromInvitation']);
+
+        });
     });
 
 });
