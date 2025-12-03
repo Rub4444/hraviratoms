@@ -128,6 +128,7 @@ class InvitationController extends Controller
 
         // ОБЯЗАТЕЛЬНО: статус pending
         $data['status'] = Invitation::STATUS_PENDING;
+        $data['is_published'] = false;
 
         // создаём приглашение
         $invitation = Invitation::create($data);
@@ -145,7 +146,8 @@ class InvitationController extends Controller
         $user = auth()->user();
 
         // изменять может только суперадмин
-        if (!$user || !$user->is_superadmin) {
+        if (!$user || !$user->is_superadmin)
+        {
             abort(403);
         }
 

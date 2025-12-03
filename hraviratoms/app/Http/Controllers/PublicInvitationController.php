@@ -16,6 +16,11 @@ class PublicInvitationController extends Controller
     {
         $invitation = Invitation::with('template')->where('slug', $slug)->firstOrFail();
 
+        if (! $invitation->is_published)
+        {
+            abort(404);
+        }
+
         return view('invitations.show', [
             'invitation' => $invitation,
         ]);

@@ -14,6 +14,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             InvitationTemplateSeeder::class,
+            AdminUserSeeder::class,
         ]);
     }
 }
