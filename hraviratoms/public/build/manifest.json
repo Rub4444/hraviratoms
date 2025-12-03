@@ -1,11 +1,11 @@
 {
   "resources/css/app.css": {
-    "file": "assets/app-mfKjs9od.css",
+    "file": "assets/app-DUk0Xk99.css",
     "src": "resources/css/app.css",
     "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "assets/app-BFZ9Kyn7.js",
+    "file": "assets/app-DttdDNZ_.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
@@ -18,11 +18,11 @@
       "resources/js/views/ForbiddenView.vue"
     ],
     "css": [
-      "assets/app-CibxKsdA.css"
+      "assets/app-CMnzq-_i.css"
     ]
   },
   "resources/js/views/ForbiddenView.vue": {
-    "file": "assets/ForbiddenView-Ogb7Nl6r.js",
+    "file": "assets/ForbiddenView-D8gNlcHH.js",
     "name": "ForbiddenView",
     "src": "resources/js/views/ForbiddenView.vue",
     "isDynamicEntry": true,
@@ -31,7 +31,7 @@
     ]
   },
   "resources/js/views/InvitationFormView.vue": {
-    "file": "assets/InvitationFormView-DHKpHJdk.js",
+    "file": "assets/InvitationFormView-BZBGy9mv.js",
     "name": "InvitationFormView",
     "src": "resources/js/views/InvitationFormView.vue",
     "isDynamicEntry": true,
@@ -40,7 +40,7 @@
     ]
   },
   "resources/js/views/InvitationRsvpListView.vue": {
-    "file": "assets/InvitationRsvpListView-feScGVKv.js",
+    "file": "assets/InvitationRsvpListView-DdoNuj_b.js",
     "name": "InvitationRsvpListView",
     "src": "resources/js/views/InvitationRsvpListView.vue",
     "isDynamicEntry": true,
@@ -49,7 +49,7 @@
     ]
   },
   "resources/js/views/InvitationsListView.vue": {
-    "file": "assets/InvitationsListView-Bm5IWw6L.js",
+    "file": "assets/InvitationsListView-ppv0kC_l.js",
     "name": "InvitationsListView",
     "src": "resources/js/views/InvitationsListView.vue",
     "isDynamicEntry": true,
@@ -58,7 +58,7 @@
     ]
   },
   "resources/js/views/TemplatesListView.vue": {
-    "file": "assets/TemplatesListView-jotacKer.js",
+    "file": "assets/TemplatesListView-CBybps29.js",
     "name": "TemplatesListView",
     "src": "resources/js/views/TemplatesListView.vue",
     "isDynamicEntry": true,
@@ -67,7 +67,7 @@
     ]
   },
   "resources/js/views/UsersListView.vue": {
-    "file": "assets/UsersListView-DC7QXhT6.js",
+    "file": "assets/UsersListView-C4Go-GeY.js",
     "name": "UsersListView",
     "src": "resources/js/views/UsersListView.vue",
     "isDynamicEntry": true,
