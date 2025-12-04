@@ -1,10 +1,14 @@
 {
-  "_Badge-Dr0HG7bP.js": {
-    "file": "assets/Badge-Dr0HG7bP.js",
+  "_Badge-DSfqQ8Of.js": {
+    "file": "assets/Badge-DSfqQ8Of.js",
     "name": "Badge",
     "imports": [
-      "resources/js/app.js"
+      "_runtime-dom.esm-bundler-CaHSP4Q1.js"
     ]
+  },
+  "_runtime-dom.esm-bundler-CaHSP4Q1.js": {
+    "file": "assets/runtime-dom.esm-bundler-CaHSP4Q1.js",
+    "name": "runtime-dom.esm-bundler"
   },
   "resources/css/app.css": {
     "file": "assets/app-BCZPpHxv.css",
@@ -12,10 +16,13 @@
     "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "assets/app-B99yQ8pg.js",
+    "file": "assets/app-5hV_1kiU.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
+    "imports": [
+      "_runtime-dom.esm-bundler-CaHSP4Q1.js"
+    ],
     "dynamicImports": [
       "resources/js/views/TemplatesListView.vue",
       "resources/js/views/InvitationsListView.vue",
@@ -28,60 +35,72 @@
       "assets/app-BxzvzAFI.css"
     ]
   },
+  "resources/js/invitation-page.js": {
+    "file": "assets/invitation-page-Dg0qGAVu.js",
+    "name": "invitation-page",
+    "src": "resources/js/invitation-page.js",
+    "isEntry": true,
+    "imports": [
+      "_runtime-dom.esm-bundler-CaHSP4Q1.js"
+    ]
+  },
   "resources/js/views/ForbiddenView.vue": {
-    "file": "assets/ForbiddenView-Dp-KIj0t.js",
+    "file": "assets/ForbiddenView-AOVWyFwX.js",
     "name": "ForbiddenView",
     "src": "resources/js/views/ForbiddenView.vue",
     "isDynamicEntry": true,
     "imports": [
-      "resources/js/app.js"
+      "resources/js/app.js",
+      "_runtime-dom.esm-bundler-CaHSP4Q1.js"
     ]
   },
   "resources/js/views/InvitationFormView.vue": {
-    "file": "assets/InvitationFormView-uw4app0G.js",
+    "file": "assets/InvitationFormView-D2QMiTf6.js",
     "name": "InvitationFormView",
     "src": "resources/js/views/InvitationFormView.vue",
     "isDynamicEntry": true,
     "imports": [
+      "_runtime-dom.esm-bundler-CaHSP4Q1.js",
       "resources/js/app.js"
     ]
   },
   "resources/js/views/InvitationRsvpListView.vue": {
-    "file": "assets/InvitationRsvpListView-CDk4r2ks.js",
+    "file": "assets/InvitationRsvpListView-BY1785m3.js",
     "name": "InvitationRsvpListView",
     "src": "resources/js/views/InvitationRsvpListView.vue",
     "isDynamicEntry": true,
     "imports": [
-      "resources/js/app.js"
+      "resources/js/app.js",
+      "_runtime-dom.esm-bundler-CaHSP4Q1.js"
     ]
   },
   "resources/js/views/InvitationsListView.vue": {
-    "file": "assets/InvitationsListView-BQQaCiJi.js",
+    "file": "assets/InvitationsListView-O5mF_9gR.js",
     "name": "InvitationsListView",
     "src": "resources/js/views/InvitationsListView.vue",
     "isDynamicEntry": true,
     "imports": [
-      "resources/js/app.js",
-      "_Badge-Dr0HG7bP.js"
+      "_runtime-dom.esm-bundler-CaHSP4Q1.js",
+      "_Badge-DSfqQ8Of.js"
     ]
   },
   "resources/js/views/TemplatesListView.vue": {
-    "file": "assets/TemplatesListView-B-_c9qr1.js",
+    "file": "assets/TemplatesListView-ofOzclDW.js",
     "name": "TemplatesListView",
     "src": "resources/js/views/TemplatesListView.vue",
     "isDynamicEntry": true,
     "imports": [
-      "_Badge-Dr0HG7bP.js",
-      "resources/js/app.js"
+      "_Badge-DSfqQ8Of.js",
+      "_runtime-dom.esm-bundler-CaHSP4Q1.js"
     ]
   },
   "resources/js/views/UsersListView.vue": {
-    "file": "assets/UsersListView-Dwdvtclr.js",
+    "file": "assets/UsersListView-KvWL5Ply.js",
     "name": "UsersListView",
     "src": "resources/js/views/UsersListView.vue",
     "isDynamicEntry": true,
     "imports": [
-      "resources/js/app.js"
+      "_runtime-dom.esm-bundler-CaHSP4Q1.js"
     ]
   }
 }
