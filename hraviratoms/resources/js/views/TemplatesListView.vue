@@ -20,11 +20,13 @@
         <p class="mt-1 text-sm text-slate-600">{{ template.description }}</p>
 
         <div class="mt-3 flex gap-2">
-            <button
+             <a
+                :href="getDemoUrl(template)"
+                target="_blank"
                 class="rounded-full bg-slate-900 px-3 py-1 text-xs font-medium text-white hover:bg-slate-800"
             >
                 Preview
-            </button>
+            </a>
             <button
                 class="btn-primary"
                 @click="$router.push({ name: 'invitations.new', params: { templateKey: template.key } })"
@@ -43,6 +45,10 @@ import { ref, onMounted } from 'vue';
 
 const templates = ref([]);
 const loading = ref(true);
+
+const getDemoUrl = (template) => {
+  return `${window.location.origin}/demo/${template.key}`;
+};
 
 onMounted(async () => {
   try {
