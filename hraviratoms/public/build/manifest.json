@@ -1,11 +1,18 @@
 {
+  "_Badge-Dr0HG7bP.js": {
+    "file": "assets/Badge-Dr0HG7bP.js",
+    "name": "Badge",
+    "imports": [
+      "resources/js/app.js"
+    ]
+  },
   "resources/css/app.css": {
-    "file": "assets/app-DUk0Xk99.css",
+    "file": "assets/app-BCZPpHxv.css",
     "src": "resources/css/app.css",
     "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "assets/app-DttdDNZ_.js",
+    "file": "assets/app-B99yQ8pg.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
@@ -18,11 +25,11 @@
       "resources/js/views/ForbiddenView.vue"
     ],
     "css": [
-      "assets/app-CMnzq-_i.css"
+      "assets/app-BxzvzAFI.css"
     ]
   },
   "resources/js/views/ForbiddenView.vue": {
-    "file": "assets/ForbiddenView-D8gNlcHH.js",
+    "file": "assets/ForbiddenView-Dp-KIj0t.js",
     "name": "ForbiddenView",
     "src": "resources/js/views/ForbiddenView.vue",
     "isDynamicEntry": true,
@@ -31,7 +38,7 @@
     ]
   },
   "resources/js/views/InvitationFormView.vue": {
-    "file": "assets/InvitationFormView-BZBGy9mv.js",
+    "file": "assets/InvitationFormView-uw4app0G.js",
     "name": "InvitationFormView",
     "src": "resources/js/views/InvitationFormView.vue",
     "isDynamicEntry": true,
@@ -40,7 +47,7 @@
     ]
   },
   "resources/js/views/InvitationRsvpListView.vue": {
-    "file": "assets/InvitationRsvpListView-DdoNuj_b.js",
+    "file": "assets/InvitationRsvpListView-CDk4r2ks.js",
     "name": "InvitationRsvpListView",
     "src": "resources/js/views/InvitationRsvpListView.vue",
     "isDynamicEntry": true,
@@ -49,25 +56,27 @@
     ]
   },
   "resources/js/views/InvitationsListView.vue": {
-    "file": "assets/InvitationsListView-ppv0kC_l.js",
+    "file": "assets/InvitationsListView-BQQaCiJi.js",
     "name": "InvitationsListView",
     "src": "resources/js/views/InvitationsListView.vue",
     "isDynamicEntry": true,
     "imports": [
-      "resources/js/app.js"
+      "resources/js/app.js",
+      "_Badge-Dr0HG7bP.js"
     ]
   },
   "resources/js/views/TemplatesListView.vue": {
-    "file": "assets/TemplatesListView-CBybps29.js",
+    "file": "assets/TemplatesListView-B-_c9qr1.js",
     "name": "TemplatesListView",
     "src": "resources/js/views/TemplatesListView.vue",
     "isDynamicEntry": true,
     "imports": [
+      "_Badge-Dr0HG7bP.js",
       "resources/js/app.js"
     ]
   },
   "resources/js/views/UsersListView.vue": {
-    "file": "assets/UsersListView-C4Go-GeY.js",
+    "file": "assets/UsersListView-Dwdvtclr.js",
     "name": "UsersListView",
     "src": "resources/js/views/UsersListView.vue",
     "isDynamicEntry": true,

@@ -6,8 +6,9 @@
     <meta name="description" content="{{ $invitation->meta_description ?? '' }}">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    @vite('resources/js/app.js')
-
+    <!-- @vite('resources/js/app.js') -->
+    @vite('resources/js/invitation-page.js')
+    <script src="https://cdn.tailwindcss.com"></script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

@@ -63,6 +63,8 @@ Route::middleware('auth')->group(function () {
     // Admin API (для Vue) — доступен только после логина
     Route::prefix('api')->group(function () {
 
+        Route::get('/me', [UserController::class, 'me']);
+
         Route::get('/invitations', [InvitationController::class, 'index']);
         Route::get('/invitations/{invitation}/rsvps', [InvitationRsvpController::class, 'index']); // RSVP-статистика
 

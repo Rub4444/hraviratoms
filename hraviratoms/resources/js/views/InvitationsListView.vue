@@ -13,6 +13,7 @@
       <div class="flex flex-wrap items-center gap-2">
         <!-- ФИЛЬТР ПО СТАТУСУ -->
         <select
+            v-if="isSuperadmin"
           v-model="statusFilter"
           class="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs text-slate-700"
         >
@@ -22,50 +23,56 @@
         </select>
 
         <!-- КНОПКА МАССОВОГО УДАЛЕНИЯ -->
-        <button
-          v-if="isSuperAdmin && selectedIds.length"
+        <Button
+          v-if="isSuperadmin && selectedIds.length"
           type="button"
-          class="rounded-full bg-red-500 px-3 py-1 text-xs font-medium text-white hover:bg-red-600"
+          variant="danger"
+          size="xs"
+          class="rounded-full px-3 py-1 text-xs"
           @click="deleteSelected"
         >
           Delete selected ({{ selectedIds.length }})
-        </button>
+        </Button>
 
         <!-- СОЗДАНИЕ НОВОГО -->
-        <button
-          v-if="isSuperAdmin"
+        <Button
+          v-if="isSuperadmin"
+          variant="primary"
+          size="xs"
           class="btn-primary text-xs"
           @click="$router.push({ name: 'templates.index' })"
         >
           + New invitation
-        </button>
+        </Button>
       </div>
     </div>
 
-    <div
+    <!-- LOADING -->
+    <Card
       v-if="loading"
       class="rounded-2xl border bg-white p-4 text-sm text-slate-500 shadow-sm"
     >
       Loading invitations...
-    </div>
+    </Card>
 
-    <div
+    <!-- ПУСТО -->
+    <Card
       v-else-if="!filteredInvitations.length"
       class="rounded-2xl border bg-white p-4 text-sm text-slate-500 shadow-sm"
     >
       Пока нет ни одного приглашения.
-    </div>
+    </Card>
 
-    <!-- ===== ОСНОВНОЙ КОНТЕНТ (ТАБЛИЦА + МОБИЛЬНЫЕ КАРТОЧКИ) ===== -->
+    <!-- ===== ОСНОВНОЙ КОНТЕНТ (ЕСЛИ ЕСТЬ ДАННЫЕ) ===== -->
     <div v-else>
       <!-- ===== DESKTOP TABLE (md+) ===== -->
-      <div
-        class="overflow-hidden rounded-2xl border bg-white shadow-sm hidden md:block"
+      <Card
+        class="hidden overflow-hidden rounded-2xl border bg-white p-0 shadow-sm md:block"
       >
         <table class="min-w-full text-left text-sm">
           <thead class="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
             <tr>
-              <th class="px-4 py-3 w-8">
+              <th class="w-8 px-4 py-3">
                 <input
                   type="checkbox"
                   :checked="allVisibleSelected"
@@ -82,119 +89,23 @@
             </tr>
           </thead>
           <tbody>
-            <tr
+            <InvitationItem
               v-for="invitation in filteredInvitations"
               :key="invitation.id"
-              class="border-t last:border-b hover:bg-slate-50/60"
-            >
-              <td class="px-4 py-3 align-top">
-                <input
-                  type="checkbox"
-                  :value="invitation.id"
-                  :checked="selectedIds.includes(invitation.id)"
-                  @change="toggleSelect(invitation.id, $event)"
-                />
-              </td>
-
-              <td class="px-4 py-3 align-top">
-                <div class="font-medium text-slate-900">
-                  {{ invitation.bride_name }} &amp; {{ invitation.groom_name }}
-                </div>
-                <div class="text-xs text-slate-500">
-                  {{ invitation.title || '—' }}
-                </div>
-              </td>
-
-              <td class="px-4 py-3 align-top text-xs text-slate-600">
-                {{ invitation.template?.name || '—' }}
-              </td>
-
-              <td class="px-4 py-3 align-top text-xs text-slate-600">
-                {{ invitation.user?.name || 'Superadmin only' }}
-              </td>
-
-              <td class="px-4 py-3 align-top text-xs text-slate-600">
-                <span v-if="invitation.date">
-                  {{ formatDate(invitation.date) }}
-                </span>
-                <span v-else>—</span>
-              </td>
-
-              <td class="px-4 py-3 align-top text-xs">
-                <span
-                  v-if="invitation.is_published"
-                  class="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700"
-                >
-                  Published
-                </span>
-                <span
-                  v-else
-                  class="inline-flex items-center rounded-full bg-slate-50 px-2 py-0.5 text-[11px] font-medium text-slate-500"
-                >
-                  Draft
-                </span>
-              </td>
-
-              <td class="px-4 py-3 align-top text-xs">
-                <div v-if="invitation.is_published">
-                  <div class="max-w-[200px] truncate text-slate-600">
-                    {{ invitation.slug }}
-                  </div>
-                  <button
-                    class="mt-1 text-[11px] text-rose-500 hover:text-rose-600"
-                    type="button"
-                    @click="copyLink(invitation)"
-                  >
-                    Copy link
-                  </button>
-                </div>
-                <div v-else class="text-red-500 text-sm">
-                  -
-                </div>
-              </td>
-
-              <td class="px-4 py-3 align-top text-right text-xs">
-                <div class="flex flex-wrap justify-end gap-2">
-                  <a
-                    v-if="isSuperAdmin"
-                    :href="getPublicUrl(invitation)"
-                    target="_blank"
-                    class="rounded-full border border-slate-200 px-3 py-1 font-medium hover:bg-slate-50"
-                  >
-                    Open
-                  </a>
-
-                  <button
-                    v-if="isSuperAdmin"
-                    class="rounded-full bg-slate-900 px-3 py-1 font-medium text-white hover:bg-slate-800"
-                    type="button"
-                    @click="$router.push({ name: 'invitations.edit', params: { id: invitation.id } })"
-                  >
-                    Edit
-                  </button>
-
-                  <button
-                    class="rounded-full border border-leaf-soft px-3 py-1 font-medium text-leaf-deep hover:bg-leaf-soft/20"
-                    type="button"
-                    @click="$router.push({ name: 'invitations.rsvps', params: { id: invitation.id } })"
-                  >
-                    RSVP
-                  </button>
-
-                  <button
-                    v-if="isSuperAdmin"
-                    class="rounded-full bg-red-500 px-3 py-1 font-medium text-white hover:bg-red-600"
-                    type="button"
-                    @click="deleteInvitation(invitation)"
-                  >
-                    Delete
-                  </button>
-                </div>
-              </td>
-            </tr>
+              :item="invitation"
+              mode="desktop"
+              :selected="selectedIds.includes(invitation.id)"
+              :is-super-admin="isSuperAdmin"
+              :public-url="getPublicUrl(invitation)"
+              @select="toggleSelect"
+              @copy="copyLink"
+              @edit="(inv) => $router.push({ name: 'invitations.edit', params: { id: inv.id } })"
+              @rsvp="(inv) => $router.push({ name: 'invitations.rsvps', params: { id: inv.id } })"
+              @delete="deleteInvitation"
+            />
           </tbody>
         </table>
-      </div>
+      </Card>
 
       <!-- ===== MOBILE CARDS (< md) ===== -->
       <div class="mt-3 space-y-3 md:hidden">
@@ -213,125 +124,20 @@
           </span>
         </div>
 
-        <div
+        <InvitationItem
           v-for="invitation in filteredInvitations"
           :key="invitation.id"
-          class="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm"
-        >
-          <div class="flex items-start justify-between gap-2">
-            <div>
-              <div class="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  :value="invitation.id"
-                  :checked="selectedIds.includes(invitation.id)"
-                  @change="toggleSelect(invitation.id, $event)"
-                />
-                <div class="font-medium text-slate-900 text-sm">
-                  {{ invitation.bride_name }} &amp; {{ invitation.groom_name }}
-                </div>
-              </div>
-              <div class="mt-0.5 text-[11px] text-slate-500">
-                {{ invitation.title || '—' }}
-              </div>
-            </div>
-
-            <div class="text-right text-[11px]">
-              <span
-                v-if="invitation.is_published"
-                class="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 font-medium text-emerald-700"
-              >
-                Published
-              </span>
-              <span
-                v-else
-                class="inline-flex items-center rounded-full bg-slate-50 px-2 py-0.5 font-medium text-slate-500"
-              >
-                Draft
-              </span>
-            </div>
-          </div>
-
-          <div class="mt-2 grid grid-cols-2 gap-1 text-[11px] text-slate-600">
-            <div>
-              <span class="font-semibold">Template:</span>
-              <span class="block truncate">
-                {{ invitation.template?.name || '—' }}
-              </span>
-            </div>
-            <div>
-              <span class="font-semibold">Owner:</span>
-              <span class="block truncate">
-                {{ invitation.user?.name || 'Superadmin only' }}
-              </span>
-            </div>
-            <div>
-              <span class="font-semibold">Date:</span>
-              <span class="block">
-                <span v-if="invitation.date">
-                  {{ formatDate(invitation.date) }}
-                </span>
-                <span v-else>—</span>
-              </span>
-            </div>
-            <div>
-              <span class="font-semibold">Link:</span>
-              <span
-                v-if="invitation.is_published"
-                class="block truncate text-slate-700"
-              >
-                {{ invitation.slug }}
-              </span>
-              <span v-else class="block text-red-500">-</span>
-            </div>
-          </div>
-
-          <div class="mt-3 flex flex-wrap gap-2 text-[11px]">
-            <button
-              v-if="invitation.is_published"
-              type="button"
-              class="rounded-full border border-rose-200 px-3 py-1 font-medium text-rose-500 hover:bg-rose-50"
-              @click="copyLink(invitation)"
-            >
-              Copy link
-            </button>
-
-            <a
-              v-if="isSuperAdmin"
-              :href="getPublicUrl(invitation)"
-              target="_blank"
-              class="rounded-full border border-slate-200 px-3 py-1 font-medium text-slate-800 hover:bg-slate-50"
-            >
-              Open
-            </a>
-
-            <button
-              v-if="isSuperAdmin"
-              class="rounded-full bg-slate-900 px-3 py-1 font-medium text-white hover:bg-slate-800"
-              type="button"
-              @click="$router.push({ name: 'invitations.edit', params: { id: invitation.id } })"
-            >
-              Edit
-            </button>
-
-            <button
-              class="rounded-full border border-leaf-soft px-3 py-1 font-medium text-leaf-deep hover:bg-leaf-soft/20"
-              type="button"
-              @click="$router.push({ name: 'invitations.rsvps', params: { id: invitation.id } })"
-            >
-              RSVP
-            </button>
-
-            <button
-              v-if="isSuperAdmin"
-              class="ml-auto rounded-full bg-red-500 px-3 py-1 font-medium text-white hover:bg-red-600"
-              type="button"
-              @click="deleteInvitation(invitation)"
-            >
-              Delete
-            </button>
-          </div>
-        </div>
+          :item="invitation"
+          mode="mobile"
+          :selected="selectedIds.includes(invitation.id)"
+          :is-super-admin="isSuperAdmin"
+          :public-url="getPublicUrl(invitation)"
+          @select="toggleSelect"
+          @copy="copyLink"
+          @edit="(inv) => $router.push({ name: 'invitations.edit', params: { id: inv.id } })"
+          @rsvp="(inv) => $router.push({ name: 'invitations.rsvps', params: { id: inv.id } })"
+          @delete="deleteInvitation"
+        />
       </div>
     </div>
 
@@ -343,25 +149,30 @@
 
 <script setup>
 import { ref, onMounted, computed } from 'vue'
+import { isSuperAdmin as isSuperAdminHelper } from '../utils/meta'
+import {
+  fetchInvitations,
+  deleteInvitationApi,
+  bulkDeleteInvitationsApi,
+} from '../services/invitationsApi'
 
-const isSuperAdmin =
-  document.querySelector('meta[name="superadmin"]')?.getAttribute('content') === '1'
+import Button from '../components/ui/Button.vue'
+import Badge from '../components/ui/Badge.vue'
+import Card from '../components/ui/Card.vue'
+import InvitationItem from '../components/invitations/InvitationItem.vue'
 
 const invitations = ref([])
 const loading = ref(true)
 const error = ref('')
 
-// фильтр по статусу
 const statusFilter = ref('all') // all | published | draft
-
-// выбранные id для массового удаления
 const selectedIds = ref([])
 
-// CSRF-токен (для DELETE)
-const csrfToken =
-  document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+// superadmin флаг
+const isSuperadmin = ref(isSuperAdminHelper())
+const isSuperAdmin = isSuperadmin // для удобства в template
 
-// отфильтрованный список по is_published
+// отфильтрованный список по статусу
 const filteredInvitations = computed(() => {
   return invitations.value.filter((inv) => {
     if (statusFilter.value === 'published') {
@@ -370,7 +181,7 @@ const filteredInvitations = computed(() => {
     if (statusFilter.value === 'draft') {
       return !inv.is_published
     }
-    return true // all
+    return true
   })
 })
 
@@ -378,7 +189,7 @@ const filteredInvitations = computed(() => {
 const allVisibleSelected = computed(() => {
   if (!filteredInvitations.value.length) return false
   return filteredInvitations.value.every((inv) =>
-    selectedIds.value.includes(inv.id)
+    selectedIds.value.includes(inv.id),
   )
 })
 
@@ -406,72 +217,43 @@ const formatDate = (value) => {
   }
 }
 
-const fetchInvitations = async () => {
+const loadData = async () => {
   loading.value = true
   error.value = ''
 
-  try {
-    const res = await fetch('/api/invitations', {
-      headers: {
-        Accept: 'application/json',
-      },
-    })
+  const { invitations: list, error: err } = await fetchInvitations()
 
-    if (res.status === 403) {
-      invitations.value = []
-      return
-    }
-
-    if (!res.ok) {
-      error.value = 'Не удалось загрузить приглашения'
-      invitations.value = []
-      return
-    }
-
-    invitations.value = await res.json()
-  } catch (e) {
-    if (import.meta.env.DEV) {
-      console.error('fetchInvitations error', e)
-    }
-    error.value = 'Ошибка при загрузке приглашений'
+  if (err) {
+    error.value = err
     invitations.value = []
-  } finally {
-    loading.value = false
+  } else {
+    invitations.value = list
   }
+
+  loading.value = false
 }
 
 const deleteInvitation = async (invitation) => {
   const confirmed = confirm(
-    `Удалить приглашение для пары "${invitation.bride_name} & ${invitation.groom_name}"?`
+    `Удалить приглашение для пары "${invitation.bride_name} & ${invitation.groom_name}"?`,
   )
 
   if (!confirmed) return
 
   try {
-    const res = await fetch(`/api/invitations/${invitation.id}`, {
-      method: 'DELETE',
-      headers: {
-        'X-CSRF-TOKEN': csrfToken,
-        Accept: 'application/json',
-      },
-    })
+    await deleteInvitationApi(invitation.id)
 
-    if (!res.ok) {
-      if (import.meta.env.DEV) {
-        console.warn('Delete error status:', res.status)
-      }
-      alert('Failed to delete invitation')
-      return
-    }
+    invitations.value = invitations.value.filter(
+      (i) => i.id !== invitation.id,
+    )
+    selectedIds.value = selectedIds.value.filter(
+      (id) => id !== invitation.id,
+    )
 
-    invitations.value = invitations.value.filter((i) => i.id !== invitation.id)
-    selectedIds.value = selectedIds.value.filter((id) => id !== invitation.id)
     alert('Invitation deleted')
   } catch (e) {
-    if (import.meta.env.DEV) {
-      console.error(e)
-    }
-    alert('Error deleting invitation')
+    console.error(e)
+    alert('Failed to delete invitation')
   }
 }
 
@@ -490,10 +272,14 @@ const toggleSelect = (id, event) => {
 const toggleSelectAll = (event) => {
   if (event.target.checked) {
     const visibleIds = filteredInvitations.value.map((inv) => inv.id)
-    selectedIds.value = Array.from(new Set([...selectedIds.value, ...visibleIds]))
+    selectedIds.value = Array.from(
+      new Set([...selectedIds.value, ...visibleIds]),
+    )
   } else {
     const visibleIds = filteredInvitations.value.map((inv) => inv.id)
-    selectedIds.value = selectedIds.value.filter((id) => !visibleIds.includes(id))
+    selectedIds.value = selectedIds.value.filter(
+      (id) => !visibleIds.includes(id),
+    )
   }
 }
 
@@ -502,36 +288,18 @@ const deleteSelected = async () => {
   if (!selectedIds.value.length) return
 
   const confirmed = confirm(
-    `Удалить выбранные приглашения (${selectedIds.value.length} шт.)?`
+    `Удалить выбранные приглашения (${selectedIds.value.length} шт.)?`,
   )
   if (!confirmed) return
 
-  for (const id of selectedIds.value) {
-    try {
-      const res = await fetch(`/api/invitations/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'X-CSRF-TOKEN': csrfToken,
-          Accept: 'application/json',
-        },
-      })
-
-      if (!res.ok && import.meta.env.DEV) {
-        console.warn('Delete error status:', id, res.status)
-      }
-    } catch (e) {
-      if (import.meta.env.DEV) {
-        console.error('Bulk delete error for', id, e)
-      }
-    }
-  }
+  await bulkDeleteInvitationsApi(selectedIds.value)
 
   invitations.value = invitations.value.filter(
-    (inv) => !selectedIds.value.includes(inv.id)
+    (inv) => !selectedIds.value.includes(inv.id),
   )
   selectedIds.value = []
   alert('Selected invitations deleted')
 }
 
-onMounted(fetchInvitations)
+onMounted(loadData)
 </script>

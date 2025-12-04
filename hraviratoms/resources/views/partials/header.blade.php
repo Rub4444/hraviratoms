@@ -41,7 +41,7 @@
                         Մուտք LoveLeaf Admin (Superadmin)
                     </a>
                 @else
-                    <a href="/admin" class="btn-admin text-[11px] sm:text-xs">
+                    <a href="/admin/invitations" class="btn-admin text-[11px] sm:text-xs">
                         Մուտք LoveLeaf Invitation
                     </a>
                 @endif

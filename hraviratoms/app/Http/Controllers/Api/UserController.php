@@ -10,6 +10,22 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
+    public function me(Request $request)
+    {
+        $user = $request->user();
+
+        if (! $user) {
+            return response()->json(['message' => 'Unauthenticated'], 401);
+        }
+
+        return response()->json([
+            'id'            => $user->id,
+            'name'          => $user->name,
+            'email'         => $user->email,
+            'is_superadmin' => $user->isSuperAdmin(),
+        ]);
+    }
+
     protected function ensureSuperadmin(): void
     {
         $user = auth()->user();

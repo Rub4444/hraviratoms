@@ -63,12 +63,10 @@
 </template>
 
 <script setup>
-const csrfToken =
-  document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+import { isSuperAdmin as isSuperAdminHelper, getCsrfToken } from '../utils/meta'
 
-// флаг superadmin — читаем из meta, как и раньше
-const isSuperAdmin =
-  document.querySelector('meta[name="superadmin"]')?.getAttribute('content') === '1'
+const csrfToken = getCsrfToken()
+const isSuperAdmin = isSuperAdminHelper()
 
 const logout = async () => {
   try {
