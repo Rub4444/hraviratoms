@@ -7,6 +7,8 @@ use App\Repositories\InvitationRepositoryInterface;
 use Illuminate\Support\ServiceProvider;
 use App\Repositories\InvitationRsvpRepositoryInterface;
 use App\Repositories\EloquentInvitationRsvpRepository;
+use App\Repositories\InvitationTemplateRepositoryInterface;
+use App\Repositories\EloquentInvitationTemplateRepository;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -23,6 +25,11 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(
             InvitationRsvpRepositoryInterface::class,
             EloquentInvitationRsvpRepository::class
+        );
+
+        $this->app->bind(
+            InvitationTemplateRepositoryInterface::class,
+            EloquentInvitationTemplateRepository::class
         );
     }
 
