@@ -6,10 +6,26 @@ use App\Http\Controllers\Controller;
 use App\Models\Invitation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use App\DTO\InvitationDto;
+use App\Enums\InvitationStatus;
+use App\Repositories\InvitationRepositoryInterface;
+use Illuminate\Http\JsonResponse;
 
 class InvitationController extends Controller
 {
-    protected function ensureCanAccessInvitation(Invitation $invitation): void
+    public function __construct(
+        private readonly InvitationRepositoryInterface $invitations
+    ) {
+    }
+
+    /**
+     * Список приглашений для текущего пользователя.
+     * - Суперадмин видит все
+     * - Обычный пользователь — только свои
+     *
+     * Возвращаем DTO + meta (удобно для пагинации на фронте).
+     */
+    public function index(): JsonResponse
     {
         $user = auth()->user();
 
@@ -17,55 +33,62 @@ class InvitationController extends Controller
             abort(401);
         }
 
-        // Суперадмин видит всё
-        if ($user->is_superadmin) {
-            return;
-        }
+        /** @var \Illuminate\Pagination\LengthAwarePaginator<\App\Models\Invitation> $paginator */
+        $paginator = $this->invitations->forUser($user, perPage: 50);
 
-        // Обычный пользователь видит только свои приглашения
-        if ($invitation->user_id !== $user->id) {
-            abort(403);
-        }
+
+        return response()->json([
+            'data' => $paginator->getCollection()
+                ->map(fn (Invitation $invitation) => InvitationDto::fromModel($invitation)->toArray())
+                ->values()
+                ->all(),
+            'meta' => [
+                'current_page' => $paginator->currentPage(),
+                'last_page'    => $paginator->lastPage(),
+                'per_page'     => $paginator->perPage(),
+                'total'        => $paginator->total(),
+            ],
+        ]);
+
     }
 
-    public function index()
+    /**
+     * Показ конкретного приглашения, на которое у пользователя есть доступ.
+     */
+    public function show(int $id): JsonResponse
     {
         $user = auth()->user();
 
-        if ($user->is_superadmin) {
-            return Invitation::with(['template', 'user'])
-                ->orderByDesc('created_at')
-                ->get();
+        if (!$user) {
+            abort(401);
         }
 
-        return Invitation::with(['template', 'user'])
-            ->where('user_id', $user->id)
-            ->orderByDesc('created_at')
-            ->get();
-    }
+        $invitation = $this->invitations->findAccessible($user, $id);
 
-
-    public function show(Invitation $invitation)
-    {
-        $this->ensureCanAccessInvitation($invitation);
-
-        if (method_exists($invitation, 'trashed') && $invitation->trashed()) {
+        if (!$invitation || (method_exists($invitation, 'trashed') && $invitation->trashed())) {
             abort(404);
         }
 
-        $invitation->load('template', 'guests', 'user'); // или rsvps
+        $invitation->load('template', 'guests', 'user');
 
-        return $invitation;
+        return response()->json(
+            InvitationDto::fromModel($invitation)->toArray()
+        );
     }
 
-
-    public function store(Request $request)
+    /**
+     * Создание приглашения — только для суперадмина.
+     */
+    public function store(Request $request): JsonResponse
     {
         $user = auth()->user();
 
-        // Обычный юзер НЕ создаёт приглашения
-        if (!$user || !$user->is_superadmin) {
-            abort(403, 'Только супер-админ может создавать приглашения.');
+        if (!$user) {
+            abort(401);
+        }
+
+        if (!$user->is_superadmin) {
+            abort(403, 'Տվյալ գործողությունը հասանելի է միայն ադմինին։');
         }
 
         $data = $request->validate([
@@ -80,27 +103,25 @@ class InvitationController extends Controller
             'dress_code'    => ['nullable', 'string', 'max:255'],
             'data'          => ['nullable', 'array'],
             'is_published'  => ['boolean'],
-
-            // ⬇ добавляем владельца, которого можно выбрать в форме
             'user_id'       => ['nullable', 'exists:users,id'],
         ]);
 
-        $data['slug'] = Str::slug(
-            ($data['bride_name'] ?? '') . '-' .
-            ($data['groom_name'] ?? '') . '-' .
-            ($data['date'] ?? now()->format('Y-m-d'))
-        ) . '-' . Str::random(5);
+        $invitation = $this->invitations->createForSuperAdmin($user, $data);
 
-        $invitation = Invitation::create($data);
+        $invitation->load('template', 'user');
 
-        return response()->json($invitation->fresh('template'), 201);
+        return response()->json(
+            InvitationDto::fromModel($invitation)->toArray(),
+            201
+        );
     }
 
-    public function publicStoreRequest(Request $request)
+    /**
+     * Публичный запрос с лендинга на создание приглашения.
+     * Оставляем без репозитория.
+     */
+    public function publicStoreRequest(Request $request): JsonResponse
     {
-        // гость или залогиненный пользователь — неважно
-        // никакой superadmin проверки!
-
         $data = $request->validate([
             'invitation_template_id' => ['required', 'exists:invitation_templates,id'],
             'bride_name'    => ['required', 'string', 'max:255'],
@@ -112,44 +133,45 @@ class InvitationController extends Controller
             'dress_code'    => ['nullable', 'string', 'max:255'],
             'data'          => ['nullable', 'array'],
 
-            // поля клиента
             'customer_name'   => ['required', 'string', 'max:255'],
             'customer_email'  => ['nullable', 'email'],
             'customer_phone'  => ['nullable', 'string', 'max:50'],
             'customer_comment'=> ['nullable', 'string'],
         ]);
 
-        // Генерируем slug точно так же, как в store()
         $data['slug'] = Str::slug(
             ($data['bride_name'] ?? '') . '-' .
             ($data['groom_name'] ?? '') . '-' .
             ($data['date'] ?? now()->format('Y-m-d'))
         ) . '-' . Str::random(5);
 
-        // ОБЯЗАТЕЛЬНО: статус pending
-        $data['status'] = Invitation::STATUS_PENDING;
+        $data['status']       = InvitationStatus::Pending; // enum → каст в модели сохранит 'pending'
         $data['is_published'] = false;
 
-        // создаём приглашение
-        $invitation = Invitation::create($data);
-
+        Invitation::create($data);
 
         return response()->json([
-            'ok' => true,
-            'message' => 'Ձեր հարցումը հաջողությամբ ուղարկվեց։'
+            'ok'      => true,
+            'message' => 'Ձեր հարցումը հաջողությամբ ուղարկվեց։',
         ], 201);
     }
 
-
-    public function update(Request $request, Invitation $invitation)
+    /**
+     * Обновление приглашения — только суперадмин.
+     */
+    public function update(Request $request, int $id): JsonResponse
     {
         $user = auth()->user();
 
-        // изменять может только суперадмин
-        if (!$user || !$user->is_superadmin)
-        {
+        if (!$user) {
+            abort(401);
+        }
+
+        if (!$user->is_superadmin) {
             abort(403);
         }
+
+        $invitation = Invitation::findOrFail($id);
 
         $data = $request->validate([
             'title'         => ['nullable', 'string', 'max:255'],
@@ -162,26 +184,34 @@ class InvitationController extends Controller
             'dress_code'    => ['nullable', 'string', 'max:255'],
             'data'          => ['nullable', 'array'],
             'is_published'  => ['boolean'],
-            'user_id'       => ['nullable', 'exists:users,id'], // ⬅ добавили
+            'user_id'       => ['nullable', 'exists:users,id'],
+            'status'        => ['nullable', 'string'],
         ]);
 
-        $invitation->update($data);
+        $invitation = $this->invitations->update($invitation, $data);
 
-        return $invitation->fresh('template');
+        $invitation->load('template', 'user');
+
+        return response()->json(
+            InvitationDto::fromModel($invitation)->toArray()
+        );
     }
 
-
-    public function destroy(Invitation $invitation)
+    /**
+     * Удаление приглашения — только суперадмин.
+     */
+    public function destroy(int $id): JsonResponse
     {
         $user = auth()->user();
 
-        // ❗ Решаем жёстко: удалять может только суперадмин
         if (!$user || !$user->is_superadmin) {
             abort(403);
         }
 
-        $invitation->delete();
+        $invitation = Invitation::findOrFail($id);
 
-        return response()->noContent();
+        $this->invitations->delete($invitation);
+
+        return response()->json(null, 204);
     }
 }

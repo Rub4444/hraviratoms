@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Enums\InvitationStatus;
 
 class Invitation extends Model
 {
@@ -42,6 +43,7 @@ class Invitation extends Model
         'data' => 'array',
         'date' => 'date',
         'is_published' => 'boolean',
+        'status' => InvitationStatus::class,
     ];
 
     public function scopePublished($query)

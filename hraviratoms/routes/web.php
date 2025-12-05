@@ -80,9 +80,12 @@ Route::middleware('auth')->group(function () {
 
 
             Route::post('/invitations', [InvitationController::class, 'store']);
-            Route::get('/invitations/{invitation}', [InvitationController::class, 'show']);
-            Route::put('/invitations/{invitation}', [InvitationController::class, 'update']);
-            Route::delete('/invitations/{invitation}', [InvitationController::class, 'destroy']);
+            Route::get('/invitations/{id}', [InvitationController::class, 'show'])
+                ->whereNumber('id');
+            Route::put('/invitations/{id}', [InvitationController::class, 'update'])
+                ->whereNumber('id');
+            Route::delete('/invitations/{id}', [InvitationController::class, 'destroy'])
+                ->whereNumber('id');
 
             // ✨ Новый эндпоинт: создать/привязать юзера по заявке
             Route::post('/invitations/{invitation}/create-user', [UserController::class, 'createFromInvitation']);

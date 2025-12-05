@@ -8,19 +8,28 @@ const JSON_HEADERS = {
 export async function fetchInvitations() {
     const res = await fetch('/api/invitations', {
         headers: JSON_HEADERS,
-    })
+    });
 
     if (res.status === 403) {
-        return { invitations: [], error: null }
+        return { data: [], meta: null, error: null };
     }
 
     if (!res.ok) {
-        return { invitations: [], error: 'Не удалось загрузить приглашения' }
+        return { data: [], meta: null, error: 'Не удалось загрузить приглашения' };
     }
 
-    const data = await res.json()
-    return { invitations: data, error: null }
+    const json = await res.json();
+
+    return {
+        data: json.data || [],   // ВАЖНО!!!
+        meta: json.meta || null,
+        error: null,
+    };
 }
+
+
+
+
 
 export async function deleteInvitationApi(id) {
     const res = await fetch(`/api/invitations/${id}`, {

@@ -221,17 +221,18 @@ const loadData = async () => {
   loading.value = true
   error.value = ''
 
-  const { invitations: list, error: err } = await fetchInvitations()
+  const { data, meta, error: err } = await fetchInvitations()
 
   if (err) {
-    error.value = err
     invitations.value = []
   } else {
-    invitations.value = list
+    invitations.value = data      // ВАЖНО!!!
   }
+
 
   loading.value = false
 }
+
 
 const deleteInvitation = async (invitation) => {
   const confirmed = confirm(
