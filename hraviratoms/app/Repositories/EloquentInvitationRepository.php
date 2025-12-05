@@ -86,4 +86,57 @@ class EloquentInvitationRepository implements InvitationRepositoryInterface
     {
         $invitation->delete();
     }
+
+    /**
+     * Публичный поиск по slug — только опубликованные.
+     */
+    public function findBySlugForPublic(string $slug): Invitation
+    {
+        return Invitation::query()
+            ->with('template')
+            ->where('slug', $slug)
+            ->where('is_published', true)
+            ->firstOrFail();
+    }
+
+    /**
+     * Создание приглашения по публичной заявке.
+     */
+    public function createFromPublicRequest(
+        int $templateId,
+        array $data,
+        ?User $user = null
+    ): Invitation {
+        $slug = Str::slug(
+            ($data['bride_name'] ?? '') . '-' .
+            ($data['groom_name'] ?? '') . '-' .
+            uniqid()
+        );
+
+        return Invitation::create([
+            'invitation_template_id' => $templateId,
+            'user_id'                => $user?->id,
+
+            'bride_name'    => $data['bride_name'],
+            'groom_name'    => $data['groom_name'],
+            'date'          => $data['date'] ?? null,
+            'time'          => $data['time'] ?? null,
+            'venue_name'    => $data['venue_name'] ?? null,
+            'venue_address' => $data['venue_address'] ?? null,
+            'dress_code'    => $data['dress_code'] ?? null,
+
+            'status'       => InvitationStatus::Pending,
+            'is_published' => false,
+
+            'slug' => $slug,
+
+            'data' => [
+                'client_name'  => $data['client_name'] ?? null,
+                'client_phone' => $data['client_phone'],
+                'client_email' => $data['client_email'] ?? null,
+                'client_notes' => $data['client_notes'] ?? null,
+                'source'       => 'public_request_form',
+            ],
+        ]);
+    }
 }

@@ -37,4 +37,23 @@ class EloquentInvitationRsvpRepository implements InvitationRsvpRepositoryInterf
 
         return InvitationRsvpStatsDto::fromCollection($rows);
     }
+
+    public function createForInvitation(Invitation $invitation, array $data): InvitationRsvp
+    {
+        $payload = [
+            'invitation_id' => $invitation->id,
+            'guest_name'    => $data['guest_name'],
+            'guest_phone'   => $data['guest_phone'] ?? null,
+            'status'        => $data['status'],
+            'guests_count'  => $data['guests_count'] ?? 1,
+            'message'       => $data['message'] ?? null,
+            'guest_ip'      => $data['guest_ip'] ?? null,
+        ];
+
+        if (empty($payload['guests_count'])) {
+            $payload['guests_count'] = 1;
+        }
+
+        return InvitationRsvp::create($payload);
+    }
 }

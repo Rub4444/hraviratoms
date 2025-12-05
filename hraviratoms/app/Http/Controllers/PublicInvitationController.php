@@ -2,33 +2,43 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Invitation;
-use App\Models\InvitationRsvp;
-use Illuminate\Http\Request;
-use App\Models\InvitationTemplate;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Mail;
 use App\Mail\InvitationCreatedNotification;
+use App\Repositories\InvitationRepositoryInterface;
+use App\Repositories\InvitationRsvpRepositoryInterface;
+use App\Repositories\InvitationTemplateRepositoryInterface;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\View\View;
 
 class PublicInvitationController extends Controller
 {
-    public function show(string $slug)
-    {
-        $invitation = Invitation::with('template')->where('slug', $slug)->firstOrFail();
+    public function __construct(
+        private readonly InvitationRepositoryInterface $invitations,
+        private readonly InvitationRsvpRepositoryInterface $rsvps,
+        private readonly InvitationTemplateRepositoryInterface $templates,
+    ) {
+    }
 
-        if (! $invitation->is_published)
-        {
-            abort(404);
-        }
+    /**
+     * Публичный просмотр приглашения.
+     * Только опубликованные (is_published = true).
+     */
+    public function show(string $slug): View
+    {
+        $invitation = $this->invitations->findBySlugForPublic($slug);
 
         return view('invitations.show', [
             'invitation' => $invitation,
         ]);
     }
 
-    public function submitRsvp(Request $request, string $slug)
+    /**
+     * Отправка RSVP с публичной страницы приглашения.
+     */
+    public function submitRsvp(Request $request, string $slug): RedirectResponse
     {
-        $invitation = Invitation::where('slug', $slug)->firstOrFail();
+        $invitation = $this->invitations->findBySlugForPublic($slug);
 
         $data = $request->validate([
             'guest_name'   => ['required', 'string', 'max:255'],
@@ -38,34 +48,21 @@ class PublicInvitationController extends Controller
             'message'      => ['nullable', 'string', 'max:2000'],
         ]);
 
-        if (empty($data['guests_count'])) {
-            $data['guests_count'] = 1;
-        }
+        $data['guest_ip'] = $request->ip();
 
-        InvitationRsvp::create([
-            'invitation_id' => $invitation->id,
-            'guest_name'    => $data['guest_name'],
-            'guest_phone'   => $data['guest_phone'] ?? null,
-            'status'        => $data['status'],
-            'guests_count'  => $data['guests_count'],
-            'message'       => $data['message'] ?? null,
-            'guest_ip'      => $request->ip(),
-        ]);
+        $this->rsvps->createForInvitation($invitation, $data);
 
         return redirect()
-        ->route('invitation.public.show', $invitation->slug)
-        ->with('rsvp_success', true);
-
+            ->route('invitation.public.show', $invitation->slug)
+            ->with('rsvp_success', true);
     }
 
     /**
-     * Показ формы заявки на приглашение
+     * Показ формы заявки на создание приглашения.
      */
-    public function showRequestForm(?string $templateKey = null)
+    public function showRequestForm(?string $templateKey = null): View
     {
-        $templates = InvitationTemplate::where('is_active', true)
-            ->orderBy('id')
-            ->get();
+        $templates = $this->templates->allActive();
 
         $selectedTemplate = null;
 
@@ -80,9 +77,9 @@ class PublicInvitationController extends Controller
     }
 
     /**
-     * Приём заявки от обычного пользователя
+     * Приём заявки от обычного пользователя.
      */
-    public function submitRequest(Request $request)
+    public function submitRequest(Request $request): RedirectResponse
     {
         $data = $request->validate([
             'template_key'  => ['required', 'exists:invitation_templates,key'],
@@ -94,65 +91,30 @@ class PublicInvitationController extends Controller
             'venue_address' => ['nullable', 'string', 'max:255'],
             'dress_code'    => ['nullable', 'string', 'max:255'],
 
-            // Контакты клиента
             'client_name'   => ['nullable', 'string', 'max:255'],
             'client_phone'  => ['required', 'string', 'max:50'],
             'client_email'  => ['nullable', 'email', 'max:255'],
             'client_notes'  => ['nullable', 'string', 'max:2000'],
         ]);
 
-        $template = InvitationTemplate::where('key', $data['template_key'])->firstOrFail();
+        $template = $this->templates->findActiveByKey($data['template_key']);
 
-        // 👇 если пользователь не авторизован — просто не заполняем user_id
-        $userId = auth()->check() ? auth()->id() : null;
+        $user = auth()->user(); // может быть null
 
-        $slug = Str::slug(
-            ($data['bride_name'] ?? '') . '-' .
-            ($data['groom_name'] ?? '') . '-' .
-            uniqid()
+        $invitation = $this->invitations->createFromPublicRequest(
+            templateId: $template->id,
+            data: $data,
+            user: $user
         );
-
-        $invitation = Invitation::create([
-            'invitation_template_id' => $template->id,
-            'user_id'                => $userId,
-
-            'bride_name'    => $data['bride_name'],
-            'groom_name'    => $data['groom_name'],
-            'date'          => $data['date'] ?? null,
-            'time'          => $data['time'] ?? null,
-            'venue_name'    => $data['venue_name'] ?? null,
-            'venue_address' => $data['venue_address'] ?? null,
-            'dress_code'    => $data['dress_code'] ?? null,
-
-            // Главное отличие от админа:
-            'status'       => Invitation::STATUS_PENDING,
-            'is_published' => false,
-
-            'slug' => $slug,
-
-            // Доп. инфа клиента складываем в JSON "data"
-            'data' => [
-                'client_name'  => $data['client_name'] ?? null,
-                'client_phone' => $data['client_phone'],
-                'client_email' => $data['client_email'] ?? null,
-                'client_notes' => $data['client_notes'] ?? null,
-                'source'       => 'public_request_form',
-            ],
-        ]);
-
-
 
         $to = env('ADMIN_NOTIFICATION_EMAIL') ?: config('mail.from.address');
 
-        if ($to)
-        {
+        if ($to) {
             Mail::to($to)->queue(new InvitationCreatedNotification($invitation, true));
         }
 
-
         return redirect()
-            ->route('landing') // это '/'
+            ->route('landing')
             ->with('request_success', 'Ձեր հայտը հաջողությամբ ուղարկվել է 🥰');
-
     }
 }

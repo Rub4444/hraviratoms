@@ -5,7 +5,6 @@ namespace App\Repositories;
 use App\Models\Invitation;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Collection;
 
 interface InvitationRepositoryInterface
 {
@@ -34,4 +33,18 @@ interface InvitationRepositoryInterface
      * Удалить приглашение.
      */
     public function delete(Invitation $invitation): void;
+
+    /**
+     * Найти приглашение по slug для публичного просмотра (только опубликованные).
+     */
+    public function findBySlugForPublic(string $slug): Invitation;
+
+    /**
+     * Создать приглашение по публичной заявке (форма /request-invitation).
+     */
+    public function createFromPublicRequest(
+        int $templateId,
+        array $data,
+        ?User $user = null
+    ): Invitation;
 }
