@@ -175,7 +175,16 @@ const fetchData = async () => {
   try {
     const id = route.params.id;
     const res = await fetch(`/api/invitations/${id}/rsvps`);
-    if (!res.ok) throw new Error('Failed to load RSVPs');
+    if (res.status === 401) {
+    throw new Error('Սեսիան ավարտվել է, խնդրում ենք կրկին մուտք գործել։');
+    }
+    if (res.status === 403) {
+    throw new Error('Դուք իրավունք չունեք դիտելու այս հրավերի RSVP-ները։');
+    }
+    if (!res.ok) {
+    throw new Error('Failed to load RSVPs');
+    }
+
 
     const data = await res.json();
     invitation.value = data.invitation;

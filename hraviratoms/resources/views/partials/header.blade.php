@@ -38,7 +38,7 @@
             @auth
                 @if(auth()->user()->is_superadmin)
                     <a href="/admin" class="btn-admin text-[11px] sm:text-xs">
-                        Մուտք LoveLeaf Admin (Superadmin)
+                        Մուտք LoveLeaf Superadmin
                     </a>
                 @else
                     <a href="/admin/invitations" class="btn-admin text-[11px] sm:text-xs">

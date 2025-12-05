@@ -20,13 +20,14 @@ class InvitationRsvpDto
     public static function fromModel(InvitationRsvp $rsvp): self
     {
         return new self(
-            id:           $rsvp->id,
-            guestName:    $rsvp->guest_name,
-            guestPhone:   $rsvp->guest_phone,
-            status:       $rsvp->status,
-            guestsCount:  (int) ($rsvp->guests_count ?? 0),
-            message:      $rsvp->message,
-            createdAt:    $rsvp->created_at?->toIso8601String() ?? '',
+            id:          $rsvp->id,
+            guestName:   $rsvp->guest_name,
+            guestPhone:  $rsvp->guest_phone,
+            status:      $rsvp->status,
+            guestsCount: (int) ($rsvp->guests_count ?? 0),
+            message:     $rsvp->message,
+            // форматируем как ISO-строку; если хочешь оставить как есть — можно использовать ->toDateTimeString()
+            createdAt:   $rsvp->created_at?->toIso8601String() ?? '',
         );
     }
 

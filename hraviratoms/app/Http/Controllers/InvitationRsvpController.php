@@ -2,11 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\DTO\InvitationRsvpDto;
 use App\Models\Invitation;
+use App\Repositories\InvitationRsvpRepositoryInterface;
 use Illuminate\Http\JsonResponse;
 
 class InvitationRsvpController extends Controller
 {
+    public function __construct(
+        private readonly InvitationRsvpRepositoryInterface $rsvps,
+    ) {
+    }
+
     protected function ensureCanAccessInvitation(Invitation $invitation): void
     {
         $user = auth()->user();
@@ -24,31 +31,31 @@ class InvitationRsvpController extends Controller
         }
     }
 
-
     public function index(Invitation $invitation): JsonResponse
     {
         $this->ensureCanAccessInvitation($invitation);
 
-        $invitation->load('rsvps');
+        // подгружаем только то, что нужно от шаблона
+        $invitation->load(['template:id,name']);
 
-        $rsvps = $invitation->rsvps()
-            ->orderBy('created_at', 'desc')
-            ->get();
+        // все RSVP берём через репозиторий
+        $rsvps = $this->rsvps->forInvitation($invitation);
 
+        // считаем статистику
         $total = $rsvps->count();
         $yes   = $rsvps->where('status', 'yes')->count();
         $no    = $rsvps->where('status', 'no')->count();
         $maybe = $rsvps->where('status', 'maybe')->count();
 
-        $guestsYesCount = $rsvps->where('status', 'yes')->sum('guests_count');
-        $guestsTotal    = $rsvps->sum('guests_count');
+        $guestsYesCount = (int) $rsvps->where('status', 'yes')->sum('guests_count');
+        $guestsTotal    = (int) $rsvps->sum('guests_count');
 
         return response()->json([
             'invitation' => [
                 'id'          => $invitation->id,
                 'bride_name'  => $invitation->bride_name,
                 'groom_name'  => $invitation->groom_name,
-                'date'        => $invitation->date,
+                'date' => optional($invitation->date)->format('Y-m-d'),
                 'slug'        => $invitation->slug,
                 'template'    => $invitation->template ? [
                     'id'   => $invitation->template->id,
@@ -63,17 +70,9 @@ class InvitationRsvpController extends Controller
                 'guests_yes_count' => $guestsYesCount,
                 'guests_total'     => $guestsTotal,
             ],
-            'items' => $rsvps->map(function ($rsvp) {
-                return [
-                    'id'           => $rsvp->id,
-                    'guest_name'   => $rsvp->guest_name,
-                    'guest_phone'  => $rsvp->guest_phone,
-                    'status'       => $rsvp->status,
-                    'guests_count' => $rsvp->guests_count,
-                    'message'      => $rsvp->message,
-                    'created_at'   => $rsvp->created_at,
-                ];
-            }),
+            'items' => $rsvps->map(
+                fn ($rsvp) => InvitationRsvpDto::fromModel($rsvp)->toArray()
+            ),
         ]);
     }
 }
