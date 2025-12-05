@@ -9,6 +9,11 @@ use App\Repositories\InvitationRsvpRepositoryInterface;
 use App\Repositories\EloquentInvitationRsvpRepository;
 use App\Repositories\InvitationTemplateRepositoryInterface;
 use App\Repositories\EloquentInvitationTemplateRepository;
+use App\Repositories\GuestRepositoryInterface;
+use App\Repositories\EloquentGuestRepository;
+use App\Repositories\UserRepositoryInterface;
+use App\Repositories\EloquentUserRepository;
+
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -31,6 +36,17 @@ class RepositoryServiceProvider extends ServiceProvider
             InvitationTemplateRepositoryInterface::class,
             EloquentInvitationTemplateRepository::class
         );
+
+        $this->app->bind(
+            GuestRepositoryInterface::class,
+            EloquentGuestRepository::class
+        );
+
+        $this->app->bind(
+            UserRepositoryInterface::class,
+            EloquentUserRepository::class
+        );
+
     }
 
     /**

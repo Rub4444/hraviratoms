@@ -2,19 +2,27 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\DTO\UserDto;
 use App\Http\Controllers\Controller;
-use App\Models\User;
 use App\Models\Invitation;
+use App\Models\User;
+use App\Repositories\UserRepositoryInterface;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Http\Response;
 
 class UserController extends Controller
 {
-    public function me(Request $request)
+    public function __construct(
+        private readonly UserRepositoryInterface $users
+    ) {
+    }
+
+    public function me(Request $request): JsonResponse
     {
         $user = $request->user();
 
-        if (! $user) {
+        if (!$user) {
             return response()->json(['message' => 'Unauthenticated'], 401);
         }
 
@@ -35,24 +43,21 @@ class UserController extends Controller
         }
     }
 
-    public function index()
+    public function index(): JsonResponse
     {
         $this->ensureSuperadmin();
 
-        // Только не удалённые пользователи
-        return User::withCount('invitations')
-            ->orderByDesc('is_superadmin')
-            ->orderBy('name')
-            ->get([
-                'id',
-                'name',
-                'email',
-                'is_superadmin',
-                'deleted_at',
-            ]);
+        $collection = $this->users->allWithInvitationsCount();
+
+        return response()->json(
+            $collection
+                ->map(fn (User $user) => UserDto::fromModel($user)->toArray())
+                ->values()
+                ->all()
+        );
     }
 
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
         $this->ensureSuperadmin();
 
@@ -63,17 +68,15 @@ class UserController extends Controller
             'is_superadmin' => ['boolean'],
         ]);
 
-        $user = User::create([
-            'name'          => $data['name'],
-            'email'         => $data['email'],
-            'password'      => Hash::make($data['password']),
-            'is_superadmin' => $data['is_superadmin'] ?? false,
-        ]);
+        $user = $this->users->create($data);
 
-        return response()->json($user, 201);
+        return response()->json(
+            UserDto::fromModel($user)->toArray(),
+            201
+        );
     }
 
-    public function update(Request $request, User $user)
+    public function update(Request $request, User $user): JsonResponse
     {
         $this->ensureSuperadmin();
 
@@ -84,34 +87,26 @@ class UserController extends Controller
             'is_superadmin' => ['boolean'],
         ]);
 
-        $user->name = $data['name'];
-        $user->email = $data['email'];
-        $user->is_superadmin = $data['is_superadmin'] ?? false;
+        $user = $this->users->update($user, $data);
 
-        if (!empty($data['password'])) {
-            $user->password = Hash::make($data['password']);
-        }
-
-        $user->save();
-
-        return $user;
+        return response()->json(
+            UserDto::fromModel($user)->toArray()
+        );
     }
 
-    public function createFromInvitation(Invitation $invitation)
+    public function createFromInvitation(Invitation $invitation): JsonResponse
     {
         $this->ensureSuperadmin();
 
-        // Если уже есть пользователь — просто вернём его
         if ($invitation->user_id && $invitation->user) {
             return response()->json([
                 'ok'         => false,
                 'message'    => 'У этого приглашения уже есть привязанный пользователь.',
-                'user'       => $invitation->user,
+                'user'       => UserDto::fromModel($invitation->user)->toArray(),
                 'invitation' => $invitation->load('user'),
             ], 400);
         }
 
-        // Берём данные клиента из JSON-поля "data"
         $payload = $invitation->data ?? [];
 
         $email = $payload['client_email'] ?? null;
@@ -125,56 +120,42 @@ class UserController extends Controller
             ], 422);
         }
 
-        // Имя: сначала client_name, если нет — на основе имён пары, если нет — email
         $name = $clientName
             ?: trim(($invitation->bride_name ?? '') . ' & ' . ($invitation->groom_name ?? ''))
             ?: $email;
 
-        // Если пользователь с таким email уже есть — просто используем его
         $user = User::where('email', $email)->first();
 
         if (!$user) {
-            $user = User::create([
-                'name'     => $name,
-                'email'    => $email,
-                // пароль = телефон из формы заявки
-                'password' => Hash::make($phone),
+            $user = $this->users->create([
+                'name'          => $name,
+                'email'         => $email,
+                'password'      => $phone,
+                'is_superadmin' => false,
             ]);
         }
 
-        // Привязываем приглашение к пользователю
         $invitation->user_id = $user->id;
         $invitation->save();
 
         return response()->json([
             'ok'         => true,
-            'user'       => $user,
+            'user'       => UserDto::fromModel($user)->toArray(),
             'invitation' => $invitation->fresh('user'),
         ]);
     }
 
-
-    public function destroy(Request $request, User $user)
+    public function destroy(Request $request, User $user): Response
     {
         $this->ensureSuperadmin();
 
-        // Нельзя удалить самого себя (по желанию)
         if (auth()->id() === $user->id) {
             abort(400, 'Нельзя удалить свой собственный аккаунт.');
         }
 
         $deleteInvitations = $request->boolean('delete_invitations');
 
-        if ($deleteInvitations) {
-            // мягко удаляем все приглашения юзера
-            Invitation::where('user_id', $user->id)->delete();
-        } else {
-            // просто отвязываем приглашения от юзера
-            Invitation::where('user_id', $user->id)->update(['user_id' => null]);
-        }
-
-        // мягко удаляем пользователя
-        $user->delete();
+        $this->users->delete($user, $deleteInvitations);
 
         return response()->noContent();
     }

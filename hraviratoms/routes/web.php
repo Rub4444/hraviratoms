@@ -9,6 +9,7 @@ use App\Http\Controllers\InvitationRsvpController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\DemoInvitationController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\Api\GuestController;
 
 /*
 |--------------------------------------------------------------------------
@@ -67,6 +68,9 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/invitations', [InvitationController::class, 'index']);
         Route::get('/invitations/{invitation}/rsvps', [InvitationRsvpController::class, 'index']); // RSVP-статистика
+
+        Route::put('/guests/{guest}', [GuestController::class, 'update']);
+        Route::delete('/guests/{guest}', [GuestController::class, 'destroy']);
 
         Route::middleware('admin')->group(function ()
         {
