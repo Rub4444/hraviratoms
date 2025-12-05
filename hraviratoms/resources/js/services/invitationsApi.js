@@ -6,26 +6,44 @@ const JSON_HEADERS = {
 }
 
 export async function fetchInvitations() {
-    const res = await fetch('/api/invitations', {
-        headers: JSON_HEADERS,
-    });
+    try {
+        const res = await fetch('/api/invitations', {
+            headers: {
+                'Accept': 'application/json',
+            },
+            credentials: 'include',
+        })
 
-    if (res.status === 403) {
-        return { data: [], meta: null, error: null };
+        if (!res.ok) {
+            throw new Error('Failed to load invitations')
+        }
+
+        const json = await res.json()
+
+        // Поддерживаем оба варианта ответа:
+        // 1) массив: [ ... ]
+        // 2) пагинатор: { data: [...], meta: {...}, ... }
+        let data
+        let meta = null
+
+        if (Array.isArray(json)) {
+            data = json
+        } else {
+            data = Array.isArray(json.data) ? json.data : []
+            meta = json.meta ?? null
+        }
+
+        return { data, meta, error: null }
+    } catch (e) {
+        console.error(e)
+        return {
+            data: [],
+            meta: null,
+            error: e.message || 'Error loading invitations',
+        }
     }
-
-    if (!res.ok) {
-        return { data: [], meta: null, error: 'Не удалось загрузить приглашения' };
-    }
-
-    const json = await res.json();
-
-    return {
-        data: json.data || [],   // ВАЖНО!!!
-        meta: json.meta || null,
-        error: null,
-    };
 }
+
 
 
 

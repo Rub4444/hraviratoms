@@ -174,7 +174,9 @@ const isSuperAdmin = isSuperadmin // для удобства в template
 
 // отфильтрованный список по статусу
 const filteredInvitations = computed(() => {
-  return invitations.value.filter((inv) => {
+  const list = Array.isArray(invitations.value) ? invitations.value : []
+
+  return list.filter((inv) => {
     if (statusFilter.value === 'published') {
       return !!inv.is_published
     }
