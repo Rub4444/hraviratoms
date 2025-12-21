@@ -143,17 +143,23 @@
             + Add program item
           </button>
         </div>
-
-        <div class="flex items-center justify-between pt-2">
-          <label class="inline-flex items-center gap-2 text-xs text-slate-600">
-            <input
-              v-model="form.is_published"
-              type="checkbox"
-              class="rounded border-slate-300 text-rose-500 focus:ring-rose-400"
-            />
-            <span>Publish invitation</span>
+        <div>
+          <label class="block text-xs font-medium text-slate-700 mb-1">
+            Invitation status
           </label>
 
+          <select
+            v-model="form.status"
+            class="block w-full rounded-xl border border-slate-200 px-3 py-2 text-sm
+                  shadow-sm focus:border-leaf focus:ring-leaf"
+          >
+            <option value="pending">Pending</option>
+            <option value="published">Published</option>
+            <option value="rejected">Rejected</option>
+          </select>
+        </div>
+
+        <div class="flex items-center justify-between pt-2">
           <button
             type="submit"
             class="rounded-full bg-rose-500 px-4 py-1.5 text-xs font-medium text-white hover:bg-rose-600"
@@ -162,6 +168,7 @@
             {{ submitting ? 'Saving...' : (isEdit ? 'Save changes' : 'Create invitation') }}
           </button>
         </div>
+
 
         <p v-if="error" class="text-xs text-red-500">
           {{ error }}
@@ -246,7 +253,7 @@ const form = ref({
   venue_name: '',
   venue_address: '',
   dress_code: '',
-  is_published: false,
+  status: 'pending',
   user_id: null,
 });
 
@@ -339,7 +346,7 @@ onMounted(async () => {
       form.value.venue_name = data.venue_name || '';
       form.value.venue_address = data.venue_address || '';
       form.value.dress_code = data.dress_code || '';
-      form.value.is_published = !!data.is_published;
+      form.value.status = data.status;
       form.value.user_id = data.user_id ?? null;
 
       const programData = data.data?.program;

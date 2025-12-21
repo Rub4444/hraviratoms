@@ -74,7 +74,7 @@ class PublicInvitationController extends Controller
             $selectedTemplate = $templates->firstWhere('key', $templateKey);
         }
 
-        return view('invitations.request', [
+        return view('invitation.request', [
             'templates'        => $templates,
             'selectedTemplate' => $selectedTemplate,
         ]);

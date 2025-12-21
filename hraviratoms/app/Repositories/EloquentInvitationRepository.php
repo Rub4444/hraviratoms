@@ -95,7 +95,7 @@ class EloquentInvitationRepository implements InvitationRepositoryInterface
         return Invitation::query()
             ->with('template')
             ->where('slug', $slug)
-            ->where('is_published', true)
+            ->where('status', InvitationStatus::Published)
             ->firstOrFail();
     }
 
@@ -126,7 +126,6 @@ class EloquentInvitationRepository implements InvitationRepositoryInterface
             'dress_code'    => $data['dress_code'] ?? null,
 
             'status'       => InvitationStatus::Pending,
-            'is_published' => false,
 
             'slug' => $slug,
 

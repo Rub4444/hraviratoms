@@ -102,7 +102,6 @@ class InvitationController extends Controller
             'venue_address' => ['nullable', 'string', 'max:255'],
             'dress_code'    => ['nullable', 'string', 'max:255'],
             'data'          => ['nullable', 'array'],
-            'is_published'  => ['boolean'],
             'user_id'       => ['nullable', 'exists:users,id'],
         ]);
 
@@ -146,7 +145,6 @@ class InvitationController extends Controller
         ) . '-' . Str::random(5);
 
         $data['status']       = InvitationStatus::Pending; // enum → каст в модели сохранит 'pending'
-        $data['is_published'] = false;
 
         Invitation::create($data);
 

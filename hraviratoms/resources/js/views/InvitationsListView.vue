@@ -18,8 +18,9 @@
           class="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs text-slate-700"
         >
           <option value="all">Все</option>
-          <option value="published">Только published</option>
-          <option value="draft">Только draft</option>
+          <option value="pending">Pending</option>
+          <option value="published">Published</option>
+          <option value="rejected">Rejected</option>
         </select>
 
         <!-- КНОПКА МАССОВОГО УДАЛЕНИЯ -->
@@ -83,7 +84,7 @@
               <th class="px-4 py-3">Template</th>
               <th class="px-4 py-3">Owner</th>
               <th class="px-4 py-3">Date</th>
-              <th class="px-4 py-3">Published</th>
+              <th class="px-4 py-3">Status</th>
               <th class="px-4 py-3">Link</th>
               <th class="px-4 py-3 text-right">Actions</th>
             </tr>
@@ -102,6 +103,7 @@
               @edit="(inv) => $router.push({ name: 'invitations.edit', params: { id: inv.id } })"
               @rsvp="(inv) => $router.push({ name: 'invitations.rsvps', params: { id: inv.id } })"
               @delete="deleteInvitation"
+              @change-status="changeStatus"
             />
           </tbody>
         </table>
@@ -123,7 +125,6 @@
             Выбрано: {{ selectedIds.length }}
           </span>
         </div>
-
         <InvitationItem
           v-for="invitation in filteredInvitations"
           :key="invitation.id"
@@ -137,6 +138,7 @@
           @edit="(inv) => $router.push({ name: 'invitations.edit', params: { id: inv.id } })"
           @rsvp="(inv) => $router.push({ name: 'invitations.rsvps', params: { id: inv.id } })"
           @delete="deleteInvitation"
+          @change-status="changeStatus"
         />
       </div>
     </div>
@@ -157,7 +159,6 @@ import {
 } from '../services/invitationsApi'
 
 import Button from '../components/ui/Button.vue'
-import Badge from '../components/ui/Badge.vue'
 import Card from '../components/ui/Card.vue'
 import InvitationItem from '../components/invitations/InvitationItem.vue'
 
@@ -174,18 +175,15 @@ const isSuperAdmin = isSuperadmin // для удобства в template
 
 // отфильтрованный список по статусу
 const filteredInvitations = computed(() => {
-  const list = Array.isArray(invitations.value) ? invitations.value : []
+  if (statusFilter.value === 'all') {
+    return invitations.value
+  }
 
-  return list.filter((inv) => {
-    if (statusFilter.value === 'published') {
-      return !!inv.is_published
-    }
-    if (statusFilter.value === 'draft') {
-      return !inv.is_published
-    }
-    return true
-  })
+  return invitations.value.filter(
+    (inv) => inv.status === statusFilter.value
+  )
 })
+
 
 // все ли видимые строки выбраны
 const allVisibleSelected = computed(() => {
@@ -219,11 +217,45 @@ const formatDate = (value) => {
   }
 }
 
+const changeStatus = async ({ id, status }) => {
+  const inv = invitations.value.find(i => i.id === id)
+  if (!inv) return
+
+  const prevStatus = inv.status
+  inv.status = status
+
+  try {
+    const res = await fetch(`/api/invitations/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+      },
+      body: JSON.stringify({ status }),
+    })
+
+    if (!res.ok) throw new Error()
+
+  } catch (e) {
+    inv.status = prevStatus // 🔙 откат
+    alert('Failed to update invitation status')
+  }
+}
+
+
+
 const loadData = async () => {
   loading.value = true
   error.value = ''
 
   const { data, meta, error: err } = await fetchInvitations()
+
+  // console.log(data.map(i => ({
+  //   id: i.id,
+  //   is_published: i.is_published,
+  //   type: typeof i.is_published
+  // })))
 
   if (err) {
     invitations.value = []

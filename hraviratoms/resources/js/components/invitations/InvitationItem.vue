@@ -1,15 +1,10 @@
 <template>
+  <!-- <pre class="text-xs text-red-500">
+  {{ JSON.stringify(item.status, null, 2) }}
+  </pre> -->
+
   <!-- DESKTOP ROW -->
   <tr v-if="mode === 'desktop'" class="border-t last:border-b hover:bg-slate-50/60">
-
-    <td class="px-4 py-3 align-top w-8">
-      <input
-        type="checkbox"
-        :value="item.id"
-        :checked="selected"
-        @change="$emit('select', item.id, $event)"
-      />
-    </td>
 
     <td class="px-4 py-3 align-top">
       <div class="font-medium text-slate-900">
@@ -34,13 +29,13 @@
     </td>
 
     <td class="px-4 py-3 align-top text-xs">
-      <Badge :type="item.is_published ? 'success' : 'gray'">
-        {{ item.is_published ? 'Published' : 'Draft' }}
+      <Badge :type="badgeType">
+        {{ statusLabel }}
       </Badge>
     </td>
 
     <td class="px-4 py-3 align-top text-xs">
-      <div v-if="item.is_published">
+      <div v-if="isPublished">
         <div class="max-w-[200px] truncate text-slate-600">
           {{ item.slug }}
         </div>
@@ -103,12 +98,6 @@
     <div class="flex items-start justify-between gap-2">
       <div>
         <div class="flex items-center gap-2">
-          <input
-            type="checkbox"
-            :value="item.id"
-            :checked="selected"
-            @change="$emit('select', item.id, $event)"
-          />
           <div class="font-medium text-slate-900 text-sm">
             {{ item.bride_name }} & {{ item.groom_name }}
           </div>
@@ -117,9 +106,8 @@
           {{ item.title || '—' }}
         </div>
       </div>
-
-      <Badge :type="item.is_published ? 'success' : 'gray'">
-        {{ item.is_published ? 'Published' : 'Draft' }}
+      <Badge :type="badgeType">
+        {{ statusLabel }}
       </Badge>
     </div>
 
@@ -128,14 +116,15 @@
       <div><span class="font-semibold">Template:</span> {{ item.template?.name || '—' }}</div>
       <div><span class="font-semibold">Owner:</span> {{ item.user?.name || '—' }}</div>
       <div><span class="font-semibold">Date:</span> {{ item.date ? formatDate(item.date) : '—' }}</div>
-      <div><span class="font-semibold">Link:</span> {{ item.is_published ? item.slug : '-' }}</div>
+      <div><span class="font-semibold">Link:</span> {{ isPublished ? item.slug : '-' }}</div>
+
     </div>
 
     <!-- Кнопки -->
     <div class="mt-3 flex flex-wrap gap-2 text-[11px]">
 
       <button
-        v-if="item.is_published"
+        v-if="isPublished"
         class="rounded-full border border-rose-200 px-3 py-1 text-rose-500 hover:bg-rose-50"
         @click="$emit('copy', item)"
       >
@@ -178,18 +167,50 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
 import Badge from '../ui/Badge.vue'
-import { isSuperAdmin as isAdmin } from '../../utils/meta'
 
 const props = defineProps({
-  item: Object,
-  mode: String, // desktop | mobile
+  item: {
+    type: Object,
+    required: true,
+  },
+  mode: {
+    type: String,
+    required: true,
+  },
   selected: Boolean,
+  isSuperAdmin: Boolean,     
+  publicUrl: String,     
 })
 
-const isSuperAdmin = isAdmin()
+const emit = defineEmits([
+  'select',
+  'copy',
+  'edit',
+  'rsvp',
+  'delete',
+])
 
-const publicUrl = `${window.location.origin}/i/${props.item.slug}`
+const statusLabel = computed(() => {
+  switch (props.item.status) {
+    case 'published': return 'Published'
+    case 'pending': return 'Pending'
+    case 'rejected': return 'Rejected'
+    default: return props.item.status
+  }
+})
+
+const badgeType = computed(() => {
+  switch (props.item.status) {
+    case 'published': return 'success'
+    case 'pending': return 'gray'
+    case 'rejected': return 'danger'
+    default: return 'gray'
+  }
+})
+
+const isPublished = computed(() => props.item.status === 'published')
 
 const formatDate = (v) => new Date(v).toLocaleDateString('ru-RU')
 </script>

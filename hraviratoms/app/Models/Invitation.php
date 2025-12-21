@@ -29,7 +29,6 @@ class Invitation extends Model
         'venue_address',
         'dress_code',
         'data',
-        'is_published',
         'meta_title',
         'meta_description',
         'status',
@@ -42,7 +41,6 @@ class Invitation extends Model
     protected $casts = [
         'data' => 'array',
         'date' => 'date',
-        'is_published' => 'boolean',
         'status' => InvitationStatus::class,
     ];
 

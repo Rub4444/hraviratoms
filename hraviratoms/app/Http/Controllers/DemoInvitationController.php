@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Invitation;
 use App\Models\InvitationTemplate;
 use Illuminate\Support\Carbon;
+use App\Enums\InvitationStatus;
 
 class DemoInvitationController extends Controller
 {
@@ -101,7 +102,7 @@ class DemoInvitationController extends Controller
         $invitation->data          = [
             'program' => $demo['program'],
         ];
-        $invitation->is_published  = true;
+        $invitation->status = InvitationStatus::Published;
         $invitation->meta_title    = $demo['template_name'] . ' · LoveLeaf Demo';
         $invitation->meta_description = 'LoveLeaf · ' . $demo['template_name'] . ' demo invitation';
 
@@ -113,7 +114,7 @@ class DemoInvitationController extends Controller
         $invitation->setRelation('template', $template);
 
         // Используем тот же Blade, что и для реальных приглашений
-        return view('invitations.show', [
+        return view('invitation.show', [
             'invitation' => $invitation,
             'isDemo' => true, // <-- добавили
         ]);
