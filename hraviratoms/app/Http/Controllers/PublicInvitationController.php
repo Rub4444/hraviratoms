@@ -26,12 +26,16 @@ class PublicInvitationController extends Controller
      */
     public function show(string $slug): View
     {
+        // Находим приглашение по slug, только опубликованные
         $invitation = $this->invitations->findBySlugForPublic($slug);
 
-        return view('invitations.show', [
-            'invitation' => $invitation,
-        ]);
+        // Берём шаблон из связанной таблицы invitation_templates
+        $templateView = $invitation->template->view; // Например 'templates.romantic'
+
+        // Рендерим приглашение через шаблон из templates/
+        return view($templateView, compact('invitation'));
     }
+
 
     /**
      * Отправка RSVP с публичной страницы приглашения.
