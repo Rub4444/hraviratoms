@@ -2,119 +2,164 @@
 @tailwind components;
 @tailwind utilities;
 
-/* База шрифтов + фонов */
+/* =========================================================
+   BASE — глобальные шрифты и дефолты
+========================================================= */
 @layer base {
 
     html,
     body {
-        @apply font-body bg-leaf-bg text-slate-900;
+        font-family: var(--font-body, 'Inter'), system-ui, sans-serif;
+        background-color: var(--color-bg, #ffffff);
+        color: var(--color-text, #0f172a);
     }
 
     h1,
     h2,
     h3,
     h4 {
-        @apply font-display text-slate-900;
+        font-family: var(--font-heading, 'Playfair Display'), serif;
+        color: var(--color-primary, #1e293b);
     }
 
     a {
-        @apply text-leaf-deep;
+        color: var(--color-accent, #94a3b8);
     }
 
     a:hover {
-        @apply text-leaf;
+        opacity: 0.8;
     }
 }
 
-/* Универсальные кнопки */
+/* =========================================================
+   COMPONENTS — кнопки, карточки (НЕ привязаны к теме)
+========================================================= */
 @layer components {
+
     .btn-primary {
-        @apply inline-flex items-center justify-center rounded-full bg-leaf px-4 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-leaf-deep;
+        @apply inline-flex items-center justify-center rounded-full px-4 py-1.5 text-xs font-medium text-white shadow-sm;
+        background-color: var(--color-primary, #1e293b);
+    }
+
+    .btn-primary:hover {
+        background-color: var(--color-accent, #94a3b8);
     }
 
     .btn-outline {
-        @apply inline-flex items-center justify-center rounded-full border border-slate-300 px-4 py-1.5 text-xs font-medium text-slate-700 hover:bg-white;
+        @apply inline-flex items-center justify-center rounded-full border px-4 py-1.5 text-xs font-medium;
+        border-color: var(--color-primary, #1e293b);
+        color: var(--color-primary, #1e293b);
     }
 
     .chip-pill {
-        @apply inline-flex items-center rounded-full bg-love-blush/80 px-3 py-1 text-[11px] font-medium text-slate-700;
+        @apply inline-flex items-center rounded-full px-3 py-1 text-[11px] font-medium;
+        background-color: var(--color-accent-soft, #f1f5f9);
+        color: var(--color-primary, #1e293b);
     }
 
     .card-soft {
-        @apply rounded-2xl border border-slate-200/70 bg-white/90 shadow-sm;
+        @apply rounded-2xl border shadow-sm;
+        background-color: var(--card-bg, rgba(255,255,255,0.9));
+        border-color: var(--card-border, #e5e7eb);
     }
 }
 
-/* Темы приглашений — перекрашиваем под LoveLeaf */
+/* =========================================================
+   INVITATION CORE (ЕДИНАЯ СТРУКТУРА)
+========================================================= */
 @layer utilities {
+
     .invite-page {
-        @apply min-h-screen flex items-center justify-center bg-leaf-bg;
+        /* 🔥 дефолтные переменные (если ничего не пришло из Blade) */
+        --color-primary: #1e293b;
+        --color-accent: #94a3b8;
+        --color-bg: #ffffff;
+        --color-text: #0f172a;
+
+        --font-heading: 'Playfair Display';
+        --font-body: 'Inter';
+
+        --card-bg: #ffffff;
+        --card-border: #e5e7eb;
+
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        background-color: var(--color-bg);
     }
 
     .invite-card {
-        @apply max-w-xl w-full rounded-3xl border shadow-xl overflow-hidden bg-white;
+        @apply max-w-xl w-full rounded-3xl border shadow-xl overflow-hidden;
+        background-color: var(--card-bg);
+        border-color: var(--card-border);
     }
 
-    /* Elegant Minimal */
-    .theme-elegant-minimal .invite-card {
-        @apply bg-white border-gold-light;
+    .invite-names {
+        font-family: var(--font-heading);
+        color: var(--color-primary);
+        @apply text-3xl;
     }
 
-    .theme-elegant-minimal .invite-names {
-        @apply font-display text-3xl tracking-[0.3em] uppercase text-slate-900;
-    }
-
-    .theme-elegant-minimal .invite-accent {
-        @apply text-gold-dark;
-    }
-
-    /* Nature Green */
-    .theme-nature-green .invite-card {
-        @apply bg-white border-leaf-soft;
-        background-image:
-            radial-gradient(circle at 0 0, #E6F0E8 0, transparent 60%),
-            radial-gradient(circle at 100% 100%, #E6F0E8 0, transparent 60%);
-    }
-
-    .theme-nature-green .invite-names {
-        @apply font-display text-3xl text-leaf-deep;
-    }
-
-    .theme-nature-green .invite-accent {
-        @apply text-leaf;
-    }
-
-    /* Luxury Black & Gold */
-    .theme-luxury-black-gold .invite-page {
-        @apply bg-slate-950;
-    }
-
-    .theme-luxury-black-gold .invite-card {
-        @apply bg-gradient-to-b from-slate-900 to-slate-950 border-gold-dark;
-    }
-
-    .theme-luxury-black-gold .invite-names {
-        @apply font-display text-3xl tracking-[0.4em] text-gold-light uppercase;
-    }
-
-    .theme-luxury-black-gold .invite-accent {
-        @apply text-gold-light;
-    }
-
-    /* Romantic Pastel */
-    .theme-romantic-pastel .invite-card {
-        @apply bg-white border-pink-200;
-        background-image:
-            radial-gradient(circle at 0 10%, #FBE7F1 0, transparent 60%),
-            radial-gradient(circle at 100% 90%, #FFEFF6 0, transparent 60%);
-    }
-
-    .theme-romantic-pastel .invite-names {
-        @apply text-3xl font-script text-pink-700;
-    }
-
-    .theme-romantic-pastel .invite-accent {
-        @apply text-pink-500;
+    .invite-accent {
+        color: var(--color-accent);
     }
 }
 
+/* =========================================================
+   THEMES — ТОЛЬКО ПРЕСЕТЫ ПЕРЕМЕННЫХ
+========================================================= */
+
+/* Elegant Minimal */
+.theme-elegant-minimal {
+    --color-primary: #1e293b;
+    --color-accent: #94a3b8;
+    --color-bg: #ffffff;
+
+    --font-heading: 'Playfair Display';
+    --font-body: 'Inter';
+
+    --card-bg: #ffffff;
+    --card-border: #e5e7eb;
+}
+
+/* Nature Green */
+.theme-nature-green {
+    --color-primary: #2f7d32;
+    --color-accent: #66bb6a;
+    --color-bg: #f1f8f4;
+
+    --font-heading: 'Playfair Display';
+    --font-body: 'Inter';
+
+    --card-bg: #ffffff;
+    --card-border: #c8e6c9;
+}
+
+/* Luxury Black & Gold */
+.theme-luxury-black-gold {
+    --color-primary: #d4af37;
+    --color-accent: #f5e6b3;
+    --color-bg: #020617;
+    --color-text: #e5e7eb;
+
+    --font-heading: 'Cormorant Garamond';
+    --font-body: 'Inter';
+
+    --card-bg: linear-gradient(to bottom, #020617, #020617);
+    --card-border: #d4af37;
+}
+
+/* Romantic Pastel */
+.theme-romantic-pastel {
+    --color-primary: #e88fb2;
+    --color-accent: #f3bfd7;
+    --color-bg: #fff7fb;
+
+    --font-heading: 'Dancing Script';
+    --font-body: 'Inter';
+
+    --card-bg: #ffffff;
+    --card-border: #f9a8d4;
+}

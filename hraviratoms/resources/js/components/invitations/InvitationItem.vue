@@ -5,6 +5,14 @@
 
   <!-- DESKTOP ROW -->
   <tr v-if="mode === 'desktop'" class="border-t last:border-b hover:bg-slate-50/60">
+    <td class="px-4 py-3 align-top w-8">
+      <input
+        type="checkbox"
+        :value="item.id"
+        :checked="selected"
+        @change="$emit('select', item.id, $event)"
+      />
+    </td>
 
     <td class="px-4 py-3 align-top">
       <div class="font-medium text-slate-900">

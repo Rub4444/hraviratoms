@@ -10,6 +10,8 @@ use App\DTO\InvitationDto;
 use App\Enums\InvitationStatus;
 use App\Repositories\InvitationRepositoryInterface;
 use Illuminate\Http\JsonResponse;
+use App\Models\InvitationTemplate;
+use App\Services\InvitationPriceCalculator;
 
 class InvitationController extends Controller
 {
@@ -82,13 +84,8 @@ class InvitationController extends Controller
     public function store(Request $request): JsonResponse
     {
         $user = auth()->user();
-
-        if (!$user) {
-            abort(401);
-        }
-
-        if (!$user->is_superadmin) {
-            abort(403, 'Տվյալ գործողությունը հասանելի է միայն ադմինին։');
+        if (!$user || !$user->is_superadmin) {
+            abort(403);
         }
 
         $data = $request->validate([
@@ -101,9 +98,29 @@ class InvitationController extends Controller
             'venue_name'    => ['nullable', 'string', 'max:255'],
             'venue_address' => ['nullable', 'string', 'max:255'],
             'dress_code'    => ['nullable', 'string', 'max:255'],
-            'data'          => ['nullable', 'array'],
             'user_id'       => ['nullable', 'exists:users,id'],
+
+            // 🔥 ТОЛЬКО override-данные
+            'data'          => ['nullable', 'array'],
         ]);
+
+        /**
+         * ❗ ВАЖНО
+         * data = ТОЛЬКО то, что клиент изменил
+         * template.config НЕ копируем
+         */
+        $data['data'] = $data['data'] ?? [];
+
+        $template = InvitationTemplate::findOrFail(
+            $data['invitation_template_id']
+        );
+
+        $features = $data['data']['features'] ?? [];
+
+        $data['price'] = InvitationPriceCalculator::calculate(
+            $template,
+            $features
+        );
 
         $invitation = $this->invitations->createForSuperAdmin($user, $data);
 
@@ -114,6 +131,8 @@ class InvitationController extends Controller
             201
         );
     }
+
+
 
     /**
      * Публичный запрос с лендинга на создание приглашения.
@@ -160,18 +179,14 @@ class InvitationController extends Controller
     public function update(Request $request, int $id): JsonResponse
     {
         $user = auth()->user();
-
-        if (!$user) {
-            abort(401);
-        }
-
-        if (!$user->is_superadmin) {
+        if (!$user || !$user->is_superadmin) {
             abort(403);
         }
 
-        $invitation = Invitation::findOrFail($id);
+        $invitation = Invitation::with('template')->findOrFail($id);
 
         $data = $request->validate([
+            'invitation_template_id' => ['nullable', 'exists:invitation_templates,id'],
             'title'         => ['nullable', 'string', 'max:255'],
             'bride_name'    => ['required', 'string', 'max:255'],
             'groom_name'    => ['required', 'string', 'max:255'],
@@ -180,13 +195,40 @@ class InvitationController extends Controller
             'venue_name'    => ['nullable', 'string', 'max:255'],
             'venue_address' => ['nullable', 'string', 'max:255'],
             'dress_code'    => ['nullable', 'string', 'max:255'],
-            'data'          => ['nullable', 'array'],
-            'is_published'  => ['boolean'],
             'user_id'       => ['nullable', 'exists:users,id'],
-            'status'        => ['nullable', 'string'],
+            'status'        => ['nullable', 'in:pending,published,rejected'],
+            'data'          => ['nullable', 'array'],
         ]);
 
-        $invitation = $this->invitations->update($invitation, $data);
+        if (isset($data['data'])) {
+            $data['data'] = array_replace_recursive(
+                $invitation->data ?? [],
+                $data['data']
+            );
+        }
+
+        if (
+            isset($data['invitation_template_id']) ||
+            isset($data['data']['features'])
+        ) {
+            $template = isset($data['invitation_template_id'])
+                ? InvitationTemplate::findOrFail($data['invitation_template_id'])
+                : $invitation->template;
+
+            $features = $data['data']['features']
+                ?? ($invitation->data['features'] ?? []);
+
+            $data['price'] = InvitationPriceCalculator::calculate($template, $features);
+        }
+
+        if (array_key_exists('data', $data)) {
+            $invitation->data = $data['data'];
+            unset($data['data']);
+        }
+
+        $invitation->fill($data);
+        $invitation->save();
+        $invitation->refresh();
 
         $invitation->load('template', 'user');
 
@@ -194,6 +236,8 @@ class InvitationController extends Controller
             InvitationDto::fromModel($invitation)->toArray()
         );
     }
+
+
 
     /**
      * Удаление приглашения — только суперадмин.

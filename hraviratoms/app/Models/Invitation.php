@@ -36,8 +36,9 @@ class Invitation extends Model
         'customer_email',
         'customer_phone',
         'customer_comment',
+        'price',
     ];
-
+    
     protected $casts = [
         'data' => 'array',
         'date' => 'date',

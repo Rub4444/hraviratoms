@@ -55,32 +55,48 @@ class EloquentInvitationRepository implements InvitationRepositoryInterface
     public function createForSuperAdmin(User $user, array $data): Invitation
     {
         if (!$user->is_superadmin) {
-            abort(403, 'Только супер-админ может создавать приглашения.');
+            abort(403);
         }
 
-        // задаём владельца и начальный статус
-        $data['user_id'] = $user->id;
-        $data['status']  = InvitationStatus::Pending;
+        $invitation = new Invitation();
 
-        if (empty($data['slug'])) {
-            $data['slug'] = Str::slug(
-                ($data['bride_name'] ?? 'invite') . '-' .
-                ($data['groom_name'] ?? 'invite') . '-' .
-                ($data['date'] ?? now()->format('Y-m-d'))
+        $invitation->fill($data);
+
+        // 🔥 КРИТИЧНО — ЯВНО
+        $invitation->data = $data['data'] ?? [];
+
+        $invitation->user_id = $user->id;
+        $invitation->status  = InvitationStatus::Pending;
+
+        if (empty($invitation->slug)) {
+            $invitation->slug = Str::slug(
+                $invitation->bride_name . '-' .
+                $invitation->groom_name . '-' .
+                ($invitation->date ?? now()->format('Y-m-d'))
             ) . '-' . Str::random(5);
         }
 
-        return Invitation::create($data);
+        $invitation->save();
+
+        return $invitation;
     }
+
 
     public function update(Invitation $invitation, array $data): Invitation
     {
-        // Можно добавить запрет менять некоторые поля, если нужно
+        // 🔥 ЯВНО обновляем JSON поле
+        if (array_key_exists('data', $data)) {
+            $invitation->data = $data['data'];
+            unset($data['data']);
+        }
+
+        // остальные поля
         $invitation->fill($data);
         $invitation->save();
 
         return $invitation;
     }
+
 
     public function delete(Invitation $invitation): void
     {

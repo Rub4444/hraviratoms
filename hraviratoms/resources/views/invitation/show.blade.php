@@ -6,16 +6,47 @@
     <meta name="description" content="{{ $invitation->meta_description ?? '' }}">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- @vite('resources/js/app.js') -->
     @vite(['resources/css/app.css', 'resources/js/invitation-page.js'])
-    <script src="https://cdn.tailwindcss.com"></script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Dancing+Script:wght@400;600&family=Inter:wght@400;500;600&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
+
+    @php
+        /*
+        |--------------------------------------------------------------------------
+        | DESIGN (template → invitation override)
+        |--------------------------------------------------------------------------
+        */
+        $templateDesign = $invitation->template->config['design'] ?? [];
+        $customDesign   = $invitation->data['design'] ?? [];
+        $design = array_replace_recursive($templateDesign, $customDesign);
+
+        /*
+        |--------------------------------------------------------------------------
+        | FEATURES (template → invitation override)
+        |--------------------------------------------------------------------------
+        */
+        $templateFeatures = $invitation->template->config['features'] ?? [];
+        $customFeatures   = $invitation->data['features'] ?? [];
+        $features = array_replace_recursive($templateFeatures, $customFeatures);
+    @endphp
 </head>
-<body class="invite-page theme-{{ $invitation->template->key }} antialiased">
+
+<body
+    class="invite-page theme-{{ $design['theme'] ?? $invitation->template->key }}"
+    style="
+        --color-primary: {{ $design['colors']['primary'] ?? '#1E293B' }};
+        --color-accent: {{ $design['colors']['accent'] ?? '#94A3B8' }};
+        --color-bg: {{ $design['colors']['background'] ?? '#ffffff' }};
+        --font-heading: '{{ $design['fonts']['heading'] ?? 'Playfair Display' }}';
+        --font-body: '{{ $design['fonts']['body'] ?? 'Inter' }}';
+    "
+>
+
 <div class="invite-card">
+
+    {{-- ================= HEADER ================= --}}
     <div class="px-6 pt-8 pb-6 text-center">
         <p class="text-[10px] tracking-[0.35em] uppercase text-slate-400">
             Օնլայն հրավիրատոմս
@@ -50,17 +81,15 @@
         @endif
     </div>
 
-    @php
-        $program = $invitation->data['program'] ?? null;
-    @endphp
-
-    @if(is_array($program) && count($program))
-        <div class="border-t border-white/30 border-slate-200/70 px-6 py-5">
+    {{-- ================= PROGRAM ================= --}}
+    @if(($features['program'] ?? false) && !empty($invitation->data['program']))
+        <div class="border-t border-slate-200/70 px-6 py-5">
             <h2 class="mb-3 text-xs font-semibold tracking-[0.25em] uppercase text-slate-500">
                 Օրվա ծրագիրը
             </h2>
+
             <ul class="space-y-2 text-sm">
-                @foreach($program as $item)
+                @foreach($invitation->data['program'] as $item)
                     <li class="flex items-start gap-3">
                         <span class="mt-0.5 w-16 text-xs font-semibold invite-accent">
                             {{ $item['time'] ?? '' }}
@@ -74,7 +103,8 @@
         </div>
     @endif
 
-        <div class="border-t border-white/30 border-slate-200/70 px-6 py-5 text-center">
+    {{-- ================= FOOTER TEXT ================= --}}
+    <div class="border-t border-slate-200/70 px-6 py-5 text-center">
         <p class="text-xs text-slate-500">
             Սիրով հրավիրում ենք Ձեզ կիսելու մեր հատուկ օրը։
         </p>
@@ -83,163 +113,71 @@
         </p>
     </div>
 
-    {{-- RSVP блок --}}
-    <div class="border-t border-white/30 border-slate-200/70 px-6 py-6">
-        <h2 class="mb-3 text-xs font-semibold tracking-[0.25em] uppercase text-slate-500">
-            Հաստատեք մասնակցությունը
-        </h2>
+    {{-- ================= RSVP ================= --}}
+    @if($features['rsvp'] ?? false)
+        <div class="border-t border-slate-200/70 px-6 py-6">
+            <h2 class="mb-3 text-xs font-semibold tracking-[0.25em] uppercase text-slate-500">
+                Հաստատեք մասնակցությունը
+            </h2>
 
-        @if(session('rsvp_success'))
-            <div class="mb-3 rounded-xl bg-leaf-soft/20 px-4 py-2 text-xs text-leaf-deep">
-                Շնորհակալություն պատասխանի համար 🕊️ Ձեր տվյալները պահպանված են։
-            </div>
-        @endif
-
-        <form @if(!isset($isDemo) || !$isDemo) method="POST"  action="{{ route('invitation.public.rsvp', $invitation->slug) }}"  @else action="{{ route('landing') }}" @endif class="grid gap-3 text-left md:grid-cols-2">
-            @csrf
-
-            <div class="md:col-span-2">
-                <label class="block text-[11px] font-medium text-slate-600">
-                    Անուն, Ազգանուն
-                </label>
-                <input
-                    type="text"
-                    name="guest_name"
-                    value="{{ old('guest_name') }}"
-                    required
-                    class="mt-1 block w-full rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-leaf focus:ring-leaf"
-                >
-                @error('guest_name')
-                    <p class="mt-1 text-[11px] text-red-500">{{ $message }}</p>
-                @enderror
-            </div>
-
-            <div>
-                <label class="block text-[11px] font-medium text-slate-600">
-                    Հեռախոս (ըստ ցանկության)
-                </label>
-                <input
-                    type="text"
-                    name="guest_phone"
-                    value="{{ old('guest_phone') }}"
-                    class="mt-1 block w-full rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-leaf focus:ring-leaf"
-                >
-                @error('guest_phone')
-                    <p class="mt-1 text-[11px] text-red-500">{{ $message }}</p>
-                @enderror
-            </div>
-
-            <div>
-                <label class="block text-[11px] font-medium text-slate-600">
-                    Քանի՞ մարդ կմասնակցի
-                </label>
-                <input
-                    type="number"
-                    name="guests_count"
-                    min="1"
-                    max="20"
-                    value="{{ old('guests_count', 1) }}"
-                    class="mt-1 block w-full rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-leaf focus:ring-leaf"
-                >
-                @error('guests_count')
-                    <p class="mt-1 text-[11px] text-red-500">{{ $message }}</p>
-                @enderror
-            </div>
-
-            <div>
-                <label class="block text-[11px] font-medium text-slate-600">
-                    Մասակցության կարգավիճակ
-                </label>
-                <div class="mt-1 flex gap-2 text-[11px] text-slate-700">
-                    <label class="inline-flex items-center gap-1">
-                        <input
-                            type="radio"
-                            name="status"
-                            value="yes"
-                            class="h-3 w-3 rounded border-slate-300 text-leaf focus:ring-leaf"
-                            {{ old('status', 'yes') === 'yes' ? 'checked' : '' }}
-                        >
-                        Կգամ
-                    </label>
-                    <label class="inline-flex items-center gap-1">
-                        <input
-                            type="radio"
-                            name="status"
-                            value="maybe"
-                            class="h-3 w-3 rounded border-slate-300 text-leaf focus:ring-leaf"
-                            {{ old('status') === 'maybe' ? 'checked' : '' }}
-                        >
-                        Հնարավոր է
-                    </label>
-                    <label class="inline-flex items-center gap-1">
-                        <input
-                            type="radio"
-                            name="status"
-                            value="no"
-                            class="h-3 w-3 rounded border-slate-300 text-leaf focus:ring-leaf"
-                            {{ old('status') === 'no' ? 'checked' : '' }}
-                        >
-                        Վերջապես չեմ կարող
-                    </label>
+            @if(session('rsvp_success'))
+                <div class="mb-3 rounded-xl px-4 py-2 text-xs"
+                     style="background: color-mix(in srgb, var(--color-accent) 20%, white); color: var(--color-primary);">
+                    Շնորհակալություն պատասխանի համար 🕊️ Ձեր տվյալները պահպանված են։
                 </div>
-                @error('status')
-                    <p class="mt-1 text-[11px] text-red-500">{{ $message }}</p>
-                @enderror
-            </div>
+            @endif
 
-            <div class="md:col-span-2">
-                <label class="block text-[11px] font-medium text-slate-600">
-                    Լրացուցիչ տեղեկություն (ըստ ցանկության)
-                </label>
-                <textarea
-                    name="message"
-                    rows="3"
-                    class="mt-1 block w-full rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-leaf focus:ring-leaf"
-                    placeholder="Օրինակ՝ կունենանք երեխա մեզ հետ, պետք է հատուկ սնունդ, կուշանանք 15 րոպե և այլն։"
-                >{{ old('message') }}</textarea>
-                @error('message')
-                    <p class="mt-1 text-[11px] text-red-500">{{ $message }}</p>
-                @enderror
-            </div>
-            <div class="md:col-span-2 flex justify-end">
-                <button
-                    type="submit"
-                    class="inline-flex items-center justify-center rounded-full bg-leaf px-5 py-2 text-xs font-medium text-white shadow-sm shadow-leaf/40 hover:bg-leaf-deep"
-                >
-                    Ուղարկել պատասխաններս
-                </button>
-            </div>
-        </form>
-        @if(isset($isDemo) && $isDemo)
-            <div class="mt-10 text-center">
-                <div class="inline-block rounded-2xl border border-leaf-soft bg-white/60 px-6 py-4 shadow-sm backdrop-blur">
-                    <p class="text-[13px] text-slate-700 font-medium">
-                        Ցանկանու՞մ եք նման օնլայն հրավիրատոմս ձեր հարսանիքի համար։
-                    </p>
-                    <p class="mt-1 text-[13px] text-slate-600">
-                        Կապ հաստատեք մեզ հետ WhatsApp կամ Viber միջոցով․
-                    </p>
+            <form
+                method="POST"
+                action="{{ route('invitation.public.rsvp', $invitation->slug) }}"
+                class="grid gap-3 text-left md:grid-cols-2"
+            >
+                @csrf
 
-                    <div class="mt-3 flex justify-center gap-3">
-                        <a href="https://wa.me/374XXXXXXXX"
-                        class="rounded-full bg-green-500 px-4 py-1.5 text-xs font-medium text-white hover:bg-green-600 transition">
-                        WhatsApp
-                        </a>
+                <div class="md:col-span-2">
+                    <label class="block text-[11px] font-medium text-slate-600">
+                        Անուն, Ազգանուն
+                    </label>
+                    <input required name="guest_name"
+                        class="mt-1 block w-full rounded-xl border border-slate-200 px-3 py-2 text-sm shadow-sm">
+                </div>
 
-                        <a href="viber://chat?number=374XXXXXXXX"
-                        class="rounded-full bg-purple-500 px-4 py-1.5 text-xs font-medium text-white hover:bg-purple-600 transition">
-                        Viber
-                        </a>
+                <div>
+                    <label class="block text-[11px] font-medium text-slate-600">
+                        Հեռախոս
+                    </label>
+                    <input name="guest_phone"
+                        class="mt-1 block w-full rounded-xl border border-slate-200 px-3 py-2 text-sm shadow-sm">
+                </div>
 
+                <div>
+                    <label class="block text-[11px] font-medium text-slate-600">
+                        Քանի՞ մարդ
+                    </label>
+                    <input type="number" name="guests_count" min="1" max="20" value="1"
+                        class="mt-1 block w-full rounded-xl border border-slate-200 px-3 py-2 text-sm shadow-sm">
+                </div>
+
+                <div class="md:col-span-2">
+                    <label class="block text-[11px] font-medium text-slate-600">
+                        Մասակցության կարգավիճակ
+                    </label>
+                    <div class="mt-1 flex gap-4 text-[11px]">
+                        <label><input type="radio" name="status" value="yes" checked> Կգամ</label>
+                        <label><input type="radio" name="status" value="maybe"> Հնարավոր է</label>
+                        <label><input type="radio" name="status" value="no"> Չեմ կարող</label>
                     </div>
                 </div>
-            </div>
-        @endif
-    </div>
+
+                <div class="md:col-span-2 text-right">
+                    <button type="submit" class="btn-primary">
+                        Ուղարկել պատասխաններս
+                    </button>
+                </div>
+            </form>
+        </div>
+    @endif
+
 </div>
-
-
 </body>
 </html>
-
-

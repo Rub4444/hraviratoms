@@ -53,6 +53,12 @@ Route::post('/login', [AuthController::class, 'login'])
 Route::post('/logout', [AuthController::class, 'logout'])
     ->name('logout');
 
+Route::prefix('api')->group(function () {
+    Route::get('/invitation-pricing', fn () => response()->json([
+        'features' => config('invitation_pricing.features'),
+    ]));
+});
+
 // Всё, что ниже — только для залогиненных
 Route::middleware('auth')->group(function () {
 

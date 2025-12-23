@@ -20,6 +20,11 @@ class InvitationTemplate extends Model
         'link_class',
     ];
 
+    protected $casts = [
+        'config' => 'array',
+    ];
+
+
     public function invitations(): HasMany
     {
         return $this->hasMany(Invitation::class);
