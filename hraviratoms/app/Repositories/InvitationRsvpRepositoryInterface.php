@@ -24,4 +24,12 @@ interface InvitationRsvpRepositoryInterface
      */
     public function createForInvitation(Invitation $invitation, array $data): InvitationRsvp;
 
+    /**
+     * Проверить, есть ли уже RSVP с этого IP для приглашения
+     */
+    public function existsForInvitationAndIp(
+        Invitation $invitation,
+        string $ip
+    ): bool;
+
 }

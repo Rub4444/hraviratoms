@@ -35,44 +35,37 @@ class InvitationRsvpController extends Controller
     {
         $this->ensureCanAccessInvitation($invitation);
 
-        // подгружаем только то, что нужно от шаблона
         $invitation->load(['template:id,name']);
 
-        // все RSVP берём через репозиторий
         $rsvps = $this->rsvps->forInvitation($invitation);
-
-        // считаем статистику
-        $total = $rsvps->count();
-        $yes   = $rsvps->where('status', 'yes')->count();
-        $no    = $rsvps->where('status', 'no')->count();
-        $maybe = $rsvps->where('status', 'maybe')->count();
-
-        $guestsYesCount = (int) $rsvps->where('status', 'yes')->sum('guests_count');
-        $guestsTotal    = (int) $rsvps->sum('guests_count');
+        $stats = $this->rsvps->statsForInvitation($invitation);
 
         return response()->json([
             'invitation' => [
-                'id'          => $invitation->id,
-                'bride_name'  => $invitation->bride_name,
-                'groom_name'  => $invitation->groom_name,
-                'date' => optional($invitation->date)->format('Y-m-d'),
-                'slug'        => $invitation->slug,
-                'template'    => $invitation->template ? [
+                'id'         => $invitation->id,
+                'bride_name' => $invitation->bride_name,
+                'groom_name' => $invitation->groom_name,
+                'date'       => optional($invitation->date)->format('Y-m-d'),
+                'slug'       => $invitation->slug,
+                'template'   => $invitation->template ? [
                     'id'   => $invitation->template->id,
                     'name' => $invitation->template->name,
                 ] : null,
             ],
+
             'stats' => [
-                'total_responses'  => $total,
-                'yes'              => $yes,
-                'no'               => $no,
-                'maybe'            => $maybe,
-                'guests_yes_count' => $guestsYesCount,
-                'guests_total'     => $guestsTotal,
+                'total_responses'  => $stats->total,
+                'yes'              => $stats->byStatus['yes']['count'] ?? 0,
+                'no'               => $stats->byStatus['no']['count'] ?? 0,
+                'maybe'            => $stats->byStatus['maybe']['count'] ?? 0,
+                'guests_yes_count' => $stats->byStatus['yes']['guests'] ?? 0,
+                'guests_total'     => $stats->guestsTotal,
             ],
+
             'items' => $rsvps->map(
                 fn ($rsvp) => InvitationRsvpDto::fromModel($rsvp)->toArray()
             ),
         ]);
     }
+
 }

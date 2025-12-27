@@ -11,6 +11,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\View\View;
 use App\Support\InvitationFeatures;
+use App\Enums\InvitationStatus;
+use Illuminate\Database\QueryException;
 
 class PublicInvitationController extends Controller
 {
@@ -39,8 +41,6 @@ class PublicInvitationController extends Controller
         );
     }
 
-
-
     /**
      * Отправка RSVP с публичной страницы приглашения.
      */
@@ -48,21 +48,44 @@ class PublicInvitationController extends Controller
     {
         $invitation = $this->invitations->findBySlugForPublic($slug);
 
+        if ($invitation->status !== InvitationStatus::Published) {
+            abort(403);
+        }
+
         $data = $request->validate([
             'guest_name'   => ['required', 'string', 'max:255'],
             'guest_phone'  => ['nullable', 'string', 'max:50'],
             'status'       => ['required', 'in:yes,no,maybe'],
-            'guests_count' => ['nullable', 'integer', 'min:1', 'max:20'],
+            'guests_count' => ['required', 'integer', 'min:1', 'max:20'],
             'message'      => ['nullable', 'string', 'max:2000'],
         ]);
 
         $data['guest_ip'] = $request->ip();
+        $cookieKey = 'rsvp_sent_'.$invitation->id;
 
-        $this->rsvps->createForInvitation($invitation, $data);
+        if (
+            $request->cookie($cookieKey) ||
+            $this->rsvps->existsForInvitationAndIp($invitation, $request->ip())
+        ) {
+            return redirect()
+                ->route('invitation.public.show', $invitation->slug)
+                ->with('rsvp_error', 'Դուք արդեն ուղարկել եք Ձեր պատասխանը։');
+        }
+
+        try {
+            $this->rsvps->createForInvitation($invitation, $data);
+        } catch (QueryException|\DomainException $e) {
+            return redirect()
+                ->route('invitation.public.show', $invitation->slug)
+                ->with('rsvp_error', 'Դուք արդեն ուղարկել եք Ձեր պատասխանը։');
+        }
+
 
         return redirect()
             ->route('invitation.public.show', $invitation->slug)
-            ->with('rsvp_success', true);
+            ->with('rsvp_success', true)
+            ->withCookie(cookie($cookieKey, true, 60 * 24 * 30));
+
     }
 
     /**
