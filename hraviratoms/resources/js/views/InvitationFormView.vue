@@ -13,9 +13,12 @@
         <span>{{ selectedTemplate?.base_price }} ֏</span>
       </div>
       <template v-for="(enabled, key) in form.data.features" :key="key">
-        <div v-if="enabled" class="flex justify-between text-slate-600">
-          <span>{{ key }}</span>
-          <span>+ {{ pricing.features?.[key] ?? 0 }} ֏</span>
+        <div
+            v-if="enabled && pricing.features?.[key]"
+            class="flex justify-between text-slate-600"
+        >
+            <span>{{ pricing.features[key].label }}</span>
+            <span>+ {{ pricing.features[key].price }} ֏</span>
         </div>
       </template>
       <div class="mt-2 border-t pt-2 flex justify-between font-semibold">
@@ -87,23 +90,37 @@
                 {{ templatesError }}
               </p>
             </div>
-            <div v-if="form.data.features">
-              <h3 class="mt-4 mb-2 text-xs font-semibold text-slate-700">
-                Features
-              </h3>
+            <div v-if="pricing.features">
+                <h3 class="mt-4 mb-2 text-xs font-semibold text-slate-700">
+                    Features
+                </h3>
 
-              <label
-                v-for="(enabled, key) in form.data.features"
-                :key="key"
-                class="flex items-center gap-2 text-sm"
-              >
-                <input
-                  type="checkbox"
-                  v-model="form.data.features[key]"
-                />
-                {{ key }}
-              </label>
+                <div
+                    v-for="(feature, key) in pricing.features"
+                    :key="key"
+                    class="flex items-start gap-3 rounded-xl border px-3 py-2 text-sm"
+                >
+                    <input
+                    type="checkbox"
+                    v-model="form.data.features[key]"
+                    class="mt-1"
+                    />
+
+                    <div class="flex-1">
+                    <div class="font-medium">
+                        {{ feature.label }}
+                        <span class="text-xs text-slate-500">
+                        (+{{ feature.price }} ֏)
+                        </span>
+                    </div>
+
+                    <div class="text-[11px] text-slate-500">
+                        {{ feature.description }}
+                    </div>
+                    </div>
+                </div>
             </div>
+
             <div v-if="form.data.design" class="mt-4">
               <h3 class="mb-2 text-xs font-semibold text-slate-700">
                 Design
@@ -126,6 +143,49 @@
                 </div>
               </div>
             </div>
+            <!-- Gallery -->
+            <div v-if="form.data.features?.gallery" class="mt-4">
+                <h3 class="mb-2 text-xs font-semibold text-slate-700">
+                    Gallery
+                </h3>
+
+                <div class="rounded-xl border border-dashed border-slate-300 p-4">
+                    <input
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    :disabled="!isEdit"
+                    class="block w-full text-xs"
+                    @change="handleGalleryUpload"
+                    />
+                    <p v-if="!isEdit" class="mt-2 text-[11px] text-amber-600">
+                        Сначала сохраните приглашение
+                    </p>
+
+                    <p class="mt-2 text-[11px] text-slate-500">
+                        Можно загрузить несколько изображений (JPG, PNG)
+                    </p>
+                </div>
+
+
+                <div v-if="gallery.length" class="mt-3 grid grid-cols-3 gap-3">
+                    <div
+                    v-for="img in gallery"
+                    :key="img.id"
+                    class="relative overflow-hidden rounded-lg border"
+                    >
+                    <img :src="img.url" class="h-24 w-full object-cover" />
+                    <button
+                        type="button"
+                        class="absolute top-1 right-1 rounded-full bg-black/60 px-1.5 text-[10px] text-white"
+                        @click="removeGalleryItem(img.id)"
+                    >
+                        ✕
+                    </button>
+                    </div>
+                </div>
+            </div>
+
             <div>
               <label class="block text-xs font-medium text-slate-700">Bride name</label>
               <input
@@ -255,41 +315,18 @@
         </p>
       </form>
 
-      <div class="hidden md:block">
-          <h2 class="mb-3 text-sm font-medium text-slate-700">Preview</h2>
-          <div
-            class="invite-page rounded-3xl border p-4"
-            :style="{
-              '--color-primary': form.data.design?.colors?.primary,
-              '--color-accent': form.data.design?.colors?.accent,
-              '--color-bg': form.data.design?.colors?.background,
-            }"
-          >
-            <div class="card-soft">
-              <div class="px-6 pt-8 pb-6 text-center">
-                <p class="text-[10px] tracking-[0.35em] uppercase text-slate-400">
-                  Օնլայն հրավիրատոմս
-                </p>
-                <h1 class="invite-names mt-3">
-                  {{ form.bride_name || 'Bride' }} &amp; {{ form.groom_name || 'Groom' }}
-                </h1>
-                <p
-                  v-if="form.date || form.time"
-                  class="mt-3 text-xs tracking-[0.25em] uppercase invite-accent"
-                >
-                  {{ form.date || '2025-11-16' }}
-                  <span v-if="form.time"> • {{ form.time }}</span>
-                </p>
-                <p v-if="form.venue_name" class="mt-3 text-sm text-slate-600">
-                  {{ form.venue_name }}
-                </p>
-              </div>
-            </div>
-          </div>
-          <p class="mt-2 text-[11px] text-slate-500">
-            Стиль превью будет зависеть от темы (Elegant, Nature, Luxury, Pastel).
-          </p>
-      </div>
+    <!-- LIVE PREVIEW -->
+    <div class="hidden md:block">
+        <h2 class="mb-3 text-sm font-medium text-slate-700">
+            Live preview
+        </h2>
+
+        <iframe
+            ref="previewFrame"
+            class="w-full h-[700px] rounded-2xl border bg-white"
+        ></iframe>
+    </div>
+
     </div>
   </section>
 </template>
@@ -305,6 +342,7 @@ import { fetchTemplates } from '@/services/templatesApi'
 ======================= */
 const route = useRoute()
 const router = useRouter()
+const previewFrame = ref(null)
 
 const props = defineProps({
   id: {
@@ -338,6 +376,84 @@ const submitting = ref(false)
 const error = ref('')
 
 /* =======================
+   GALLERY
+======================= */
+const gallery = ref([])
+
+const removeGalleryItem = async (imageId) => {
+  if (!props.id) return
+
+  try {
+    const res = await fetch(
+      `/api/invitations/${props.id}/gallery/${imageId}`,
+      {
+        method: 'DELETE',
+        headers: {
+          'X-CSRF-TOKEN': csrfToken,
+          Accept: 'application/json',
+        },
+      }
+    )
+
+    if (!res.ok) throw new Error('Delete failed')
+
+    const data = await res.json()
+    gallery.value = data.gallery.map(img => ({
+    ...img,
+    url: `/storage/${img.path}`,
+    }))
+
+  } catch (e) {
+    alert(e.message || 'Ошибка удаления изображения')
+  }
+}
+
+const handleGalleryUpload = async (event) => {
+  if (!isEdit.value || !props.id) {
+    alert('Сначала сохраните приглашение')
+    return
+  }
+
+  const files = Array.from(event.target.files)
+  if (!files.length) return
+
+  const formData = new FormData()
+  files.forEach(file => {
+    formData.append('images[]', file)
+  })
+
+  try {
+    const res = await fetch(
+      `/api/invitations/${props.id}/gallery`,
+      {
+        method: 'POST',
+        headers: {
+          'X-CSRF-TOKEN': csrfToken,
+          Accept: 'application/json',
+        },
+        body: formData,
+      }
+    )
+
+    if (!res.ok) throw new Error('Upload failed')
+
+    const data = await res.json()
+
+    gallery.value = data.gallery.map(img => ({
+    ...img,
+    url: `/storage/${img.path}`,
+    }))
+
+
+    // очистить input
+    event.target.value = ''
+  } catch (e) {
+    alert(e.message || 'Ошибка загрузки изображений')
+  }
+}
+
+
+/* =======================
    FORM
 ======================= */
 function normalizeConfig(config = {}) {
@@ -356,6 +472,47 @@ function normalizeConfig(config = {}) {
       },
     },
   }
+}
+
+const buildPreviewPayload = () => ({
+  template_key: selectedTemplate.value?.key,
+  invitation: {
+    bride_name: form.value.bride_name,
+    groom_name: form.value.groom_name,
+    date: form.value.date,
+    time: form.value.time,
+    venue_name: form.value.venue_name,
+    venue_address: form.value.venue_address,
+    dress_code: form.value.dress_code,
+    data: {
+      features: form.value.data.features,
+      design: form.value.data.design,
+      program: program.value,
+      gallery: gallery.value.map(img => ({
+        path: img.path ?? img.url?.replace('/storage/', '')
+      })),
+    }
+  }
+})
+
+const updatePreview = async () => {
+  if (!previewFrame.value || !selectedTemplate.value) return
+
+  const iframe = previewFrame.value
+  const payload = buildPreviewPayload()
+
+  const html = `
+    <form id="previewForm" method="POST" action="/preview/invitation">
+      <input type="hidden" name="_token" value="${csrfToken}">
+      <input type="hidden" name="template_key" value="${payload.template_key}">
+      <input type="hidden" name="invitation" value='${JSON.stringify(payload.invitation)}'>
+    </form>
+    <script>
+      document.getElementById('previewForm').submit()
+    <\/script>
+  `
+
+  iframe.srcdoc = html
 }
 
 
@@ -396,7 +553,6 @@ const templateTitle = computed(() => {
   return isEdit.value ? 'Existing invitation' : ''
 })
 
-
 const totalPrice = computed(() => {
   if (!selectedTemplate.value) return 0
 
@@ -404,7 +560,7 @@ const totalPrice = computed(() => {
 
   for (const key in form.value.data.features) {
     if (form.value.data.features[key]) {
-      price += pricing.value.features?.[key] || 0
+      price += pricing.value.features?.[key]?.price || 0
     }
   }
 
@@ -426,6 +582,28 @@ watch(templates, () => {
   selectedTemplate.value =
     templates.value.find(t => t.id === form.value.invitation_template_id) || null
 })
+
+watch(
+  () => form.value.data.features.gallery,
+  enabled => {
+    if (!enabled) {
+      gallery.value = []
+    }
+  }
+)
+
+watch(
+  [
+    () => selectedTemplate.value,
+    () => form.value,
+    () => program.value,
+    () => gallery.value,
+  ],
+  () => {
+    updatePreview()
+  },
+  { deep: true }
+)
 
 /* =======================
    API HELPERS
@@ -479,6 +657,13 @@ const loadInvitation = async () => {
     ? data.config.program
     : []
 
+  gallery.value = Array.isArray(data.config?.gallery)
+  ? data.config.gallery.map(img => ({
+      ...img,
+      url: `/storage/${img.path}`,
+    }))
+  : []
+
   // 🔥 ВОТ ТУТ, И ТОЛЬКО ТУТ
   selectedTemplate.value =
     templates.value.find(t => t.id === form.value.invitation_template_id) || null
@@ -529,7 +714,7 @@ const handleSubmit = async () => {
   if (!form.value.time) {
     alert('Time is empty in form state')
   }
-  
+
   submitting.value = true
   error.value = ''
 
@@ -595,6 +780,8 @@ onMounted(async () => {
     } else if (props.templateKey) {
       await loadTemplateByKey()
     }
+    setTimeout(updatePreview, 300)
+
   } catch (e) {
     error.value = e.message || 'Initialization failed'
   }

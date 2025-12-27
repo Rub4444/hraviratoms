@@ -12,6 +12,7 @@ use App\Repositories\InvitationRepositoryInterface;
 use Illuminate\Http\JsonResponse;
 use App\Models\InvitationTemplate;
 use App\Services\InvitationPriceCalculator;
+use Illuminate\Support\Facades\Storage;
 
 class InvitationController extends Controller
 {
@@ -256,4 +257,77 @@ class InvitationController extends Controller
 
         return response()->json(null, 204);
     }
+
+    public function uploadGallery(Request $request, int $id): JsonResponse
+    {
+        $user = auth()->user();
+        if (!$user || !$user->is_superadmin) {
+            abort(403);
+        }
+
+        $invitation = Invitation::findOrFail($id);
+
+        $request->validate([
+            'images'   => ['required', 'array'],
+            'images.*' => ['image', 'max:4096'],
+        ]);
+
+        $gallery = $invitation->data['gallery'] ?? [];
+        $order = count($gallery) + 1;
+
+        foreach ($request->file('images') as $file) {
+            $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
+
+            $path = $file->storeAs(
+                "invitations/{$invitation->id}",
+                $filename,
+                'public'
+            );
+
+            $gallery[] = [
+                'id'    => (string) Str::uuid(),
+                'path'  => $path,
+                'order' => $order++,
+            ];
+        }
+
+        $invitation->data = array_replace_recursive(
+            $invitation->data ?? [],
+            ['gallery' => $gallery]
+        );
+
+        $invitation->save();
+
+        return response()->json([
+            'gallery' => $gallery,
+        ]);
+    }
+
+    public function deleteGallery(int $id, string $imageId): JsonResponse
+    {
+        $user = auth()->user();
+        if (!$user || !$user->is_superadmin) {
+            abort(403);
+        }
+
+        $invitation = Invitation::findOrFail($id);
+
+        $gallery = $invitation->data['gallery'] ?? [];
+
+        $gallery = array_values(array_filter($gallery, function ($img) use ($imageId) {
+            return $img['id'] !== $imageId;
+        }));
+
+        $invitation->data = array_replace_recursive(
+            $invitation->data ?? [],
+            ['gallery' => $gallery]
+        );
+
+        $invitation->save();
+
+        return response()->json([
+            'gallery' => $gallery,
+        ]);
+    }
+
 }

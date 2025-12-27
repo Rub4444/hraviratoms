@@ -10,6 +10,10 @@ use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\DemoInvitationController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Api\GuestController;
+use App\Models\InvitationTemplate;
+use App\Models\Invitation;
+use Illuminate\Http\Request;
+use App\Http\Controllers\PreviewInvitationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -53,11 +57,17 @@ Route::post('/login', [AuthController::class, 'login'])
 Route::post('/logout', [AuthController::class, 'logout'])
     ->name('logout');
 
-Route::prefix('api')->group(function () {
-    Route::get('/invitation-pricing', fn () => response()->json([
+
+Route::get('/api/invitation-pricing', function () {
+    return response()->json([
         'features' => config('invitation_pricing.features'),
-    ]));
+    ]);
 });
+
+/**
+ * 🔍 Live preview приглашения (для админки)
+ */
+Route::post('/preview/invitation', [PreviewInvitationController::class, 'show']);
 
 // Всё, что ниже — только для залогиненных
 Route::middleware('auth')->group(function () {
@@ -87,6 +97,9 @@ Route::middleware('auth')->group(function () {
 
             Route::get('/templates', [InvitationTemplateController::class, 'index']);
             Route::get('/templates/{key}', [InvitationTemplateController::class, 'show']);
+
+            Route::post('/invitations/{id}/gallery', [InvitationController::class, 'uploadGallery']);
+            Route::delete('/invitations/{id}/gallery/{imageId}', [InvitationController::class, 'deleteGallery']);
 
 
             Route::post('/invitations', [InvitationController::class, 'store']);

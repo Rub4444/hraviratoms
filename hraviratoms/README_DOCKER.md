@@ -195,3 +195,4 @@ docker compose up --build -d
 - All application files are mounted as volumes for live development
 - The application runs on port 8000 by default (change in `docker-compose.yml` if needed)
 
+

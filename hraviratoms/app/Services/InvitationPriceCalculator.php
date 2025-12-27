@@ -10,7 +10,7 @@ class InvitationPriceCalculator
         InvitationTemplate $template,
         array $featuresOverride = []
     ): int {
-        $base = $template->base_price;
+        $total = (int) $template->base_price;
 
         $templateFeatures = $template->config['features'] ?? [];
 
@@ -19,11 +19,11 @@ class InvitationPriceCalculator
             $featuresOverride
         );
 
-        $total = $base;
+        $pricing = config('invitation_pricing.features');
 
         foreach ($features as $feature => $enabled) {
-            if ($enabled) {
-                $total += config("invitation_pricing.features.$feature", 0);
+            if ($enabled && isset($pricing[$feature])) {
+                $total += (int) $pricing[$feature]['price'];
             }
         }
 

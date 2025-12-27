@@ -10,6 +10,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\View\View;
+use App\Support\InvitationFeatures;
 
 class PublicInvitationController extends Controller
 {
@@ -26,15 +27,18 @@ class PublicInvitationController extends Controller
      */
     public function show(string $slug): View
     {
-        // Находим приглашение по slug, только опубликованные
         $invitation = $this->invitations->findBySlugForPublic($slug);
 
-        // Берём шаблон из связанной таблицы invitation_templates
-        $templateView = $invitation->template->view; // Например 'templates.romantic'
-
-        // Рендерим приглашение через шаблон из templates/
-        return view($templateView, compact('invitation'));
+        return view(
+            $invitation->template->view,
+            [
+                'invitation' => $invitation,
+                'features'   => InvitationFeatures::resolve($invitation),
+                'preview'    => false, // важно
+            ]
+        );
     }
+
 
 
     /**
