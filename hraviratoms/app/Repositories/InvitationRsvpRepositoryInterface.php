@@ -6,7 +6,7 @@ use App\Models\Invitation;
 use Illuminate\Support\Collection;
 use App\DTO\InvitationRsvpStatsDto;
 use App\Models\InvitationRsvp;
-
+use App\DTO\InvitationRsvpCollectionDto;
 interface InvitationRsvpRepositoryInterface
 {
     /**
@@ -32,4 +32,7 @@ interface InvitationRsvpRepositoryInterface
         string $ip
     ): bool;
 
+    public function listWithStats(
+        Invitation $invitation
+    ): InvitationRsvpCollectionDto;
 }

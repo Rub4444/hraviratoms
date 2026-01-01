@@ -23,7 +23,13 @@
       </template>
       <div class="mt-2 border-t pt-2 flex justify-between font-semibold">
         <span>Total</span>
-        <span>{{ totalPrice }} ֏</span>
+        <span v-if="priceLoading" class="text-slate-400 animate-pulse">
+          calculating…
+        </span>
+
+        <span v-else>
+          {{ totalPrice }} ֏
+        </span>
       </div>
     </div>
 
@@ -336,6 +342,63 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import axios from 'axios'
 import { fetchTemplates } from '@/services/templatesApi'
+import { debounce } from '@/utils/debounce'
+
+const priceLoading = ref(false)
+
+const recalcPrice = async () => {
+  if (!selectedTemplate.value) return
+
+  priceLoading.value = true
+
+  try {
+    const res = await fetch('/api/invitations/calculate-price', {
+      method: 'POST',
+      headers: {
+        'X-CSRF-TOKEN': csrfToken,
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+      body: JSON.stringify({
+        template_id: selectedTemplate.value.id,
+        features: form.value.data.features,
+      }),
+    })
+
+    if (!res.ok) return
+
+    const data = await res.json()
+    totalPrice.value = data.price
+  } finally {
+    priceLoading.value = false
+  }
+}
+
+const recalcPriceDebounced = debounce(recalcPrice, 300)
+
+const priceSignature = computed(() => {
+  return JSON.stringify({
+    template_id: selectedTemplate.value?.id,
+    features: form.value.data.features,
+  })
+})
+
+const previewSignature = computed(() => {
+  return JSON.stringify({
+    template: selectedTemplate.value?.key,
+    bride: form.value.bride_name,
+    groom: form.value.groom_name,
+    date: form.value.date,
+    time: form.value.time,
+    venue: form.value.venue_name,
+    address: form.value.venue_address,
+    dress: form.value.dress_code,
+    features: form.value.data.features,
+    design: form.value.data.design,
+    program: program.value,
+    gallery: gallery.value.map(g => g.path ?? g.url),
+  })
+})
 
 /* =======================
    ROUTER / PROPS
@@ -444,7 +507,6 @@ const handleGalleryUpload = async (event) => {
     url: `/storage/${img.path}`,
     }))
 
-
     // очистить input
     event.target.value = ''
   } catch (e) {
@@ -515,6 +577,7 @@ const updatePreview = async () => {
   iframe.srcdoc = html
 }
 
+const updatePreviewDebounced = debounce(updatePreview, 500)
 
 const form = ref({
   invitation_template_id: null,
@@ -553,19 +616,7 @@ const templateTitle = computed(() => {
   return isEdit.value ? 'Existing invitation' : ''
 })
 
-const totalPrice = computed(() => {
-  if (!selectedTemplate.value) return 0
-
-  let price = selectedTemplate.value.base_price || 0
-
-  for (const key in form.value.data.features) {
-    if (form.value.data.features[key]) {
-      price += pricing.value.features?.[key]?.price || 0
-    }
-  }
-
-  return price
-})
+const totalPrice = ref(0)
 
 /* =======================
    WATCHERS
@@ -592,18 +643,29 @@ watch(
   }
 )
 
-watch(
-  [
-    () => selectedTemplate.value,
-    () => form.value,
-    () => program.value,
-    () => gallery.value,
-  ],
-  () => {
-    updatePreview()
-  },
-  { deep: true }
-)
+let lastPreviewSignature = null
+
+watch(previewSignature, () => {
+  if (!selectedTemplate.value) return
+
+  if (previewSignature.value === lastPreviewSignature) return
+
+  lastPreviewSignature = previewSignature.value
+  updatePreviewDebounced()
+})
+
+
+let lastSignature = null
+
+watch(priceSignature, () => {
+  if (!selectedTemplate.value) return
+
+  if (priceSignature.value === lastSignature) return
+
+  lastSignature = priceSignature.value
+  recalcPriceDebounced()
+})
+
 
 /* =======================
    API HELPERS
@@ -650,6 +712,8 @@ const loadInvitation = async () => {
   form.value.status = data.status
   form.value.user_id = data.user_id ?? null
 
+  totalPrice.value = data.price
+
   // 🔥 ВАЖНО
   form.value.data = normalizeConfig(data.config)
 
@@ -663,6 +727,9 @@ const loadInvitation = async () => {
       url: `/storage/${img.path}`,
     }))
   : []
+  
+  lastSignature = null
+  recalcPriceDebounced()
 
   // 🔥 ВОТ ТУТ, И ТОЛЬКО ТУТ
   selectedTemplate.value =
@@ -751,6 +818,7 @@ const handleSubmit = async () => {
     if (!res.ok) throw new Error('Save failed')
 
     const saved = await res.json()
+    totalPrice.value = saved.price
 
     alert(
       isEdit.value
@@ -780,7 +848,9 @@ onMounted(async () => {
     } else if (props.templateKey) {
       await loadTemplateByKey()
     }
-    setTimeout(updatePreview, 300)
+    if (selectedTemplate.value) {
+      updatePreview()
+    }
 
   } catch (e) {
     error.value = e.message || 'Initialization failed'

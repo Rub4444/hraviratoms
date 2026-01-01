@@ -7,6 +7,8 @@ use App\Models\Invitation;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Str;
+use App\Services\InvitationPriceCalculator;
+use App\Models\InvitationTemplate;
 
 class EloquentInvitationRepository implements InvitationRepositoryInterface
 {
@@ -62,8 +64,18 @@ class EloquentInvitationRepository implements InvitationRepositoryInterface
 
         $invitation->fill($data);
 
-        // 🔥 КРИТИЧНО — ЯВНО
+        // 🔥 ЯВНО JSON
         $invitation->data = $data['data'] ?? [];
+
+        // 🔥 ЦЕНА
+        $template = InvitationTemplate::findOrFail(
+            $invitation->invitation_template_id
+        );
+
+        $invitation->price = InvitationPriceCalculator::calculate(
+            $template,
+            $invitation->data['features'] ?? []
+        );
 
         $invitation->user_id = $user->id;
         $invitation->status  = InvitationStatus::Pending;
@@ -84,7 +96,7 @@ class EloquentInvitationRepository implements InvitationRepositoryInterface
 
     public function update(Invitation $invitation, array $data): Invitation
     {
-        // 🔥 ЯВНО обновляем JSON поле
+        // JSON
         if (array_key_exists('data', $data)) {
             $invitation->data = $data['data'];
             unset($data['data']);
@@ -92,7 +104,19 @@ class EloquentInvitationRepository implements InvitationRepositoryInterface
 
         // остальные поля
         $invitation->fill($data);
+
+        // 🔥 ПЕРЕСЧЁТ ЦЕНЫ
+        $template = $invitation->template
+            ?? InvitationTemplate::findOrFail($invitation->invitation_template_id);
+
+
+        $invitation->price = InvitationPriceCalculator::calculate(
+            $template,
+            $invitation->data['features'] ?? []
+        );
+
         $invitation->save();
+
 
         return $invitation;
     }

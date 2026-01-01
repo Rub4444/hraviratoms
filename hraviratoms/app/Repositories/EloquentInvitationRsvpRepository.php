@@ -6,6 +6,8 @@ use App\DTO\InvitationRsvpStatsDto;
 use App\Models\Invitation;
 use App\Models\InvitationRsvp;
 use Illuminate\Support\Collection;
+use DomainException;
+use App\DTO\InvitationRsvpCollectionDto;
 
 class EloquentInvitationRsvpRepository implements InvitationRsvpRepositoryInterface
 {
@@ -53,9 +55,11 @@ class EloquentInvitationRsvpRepository implements InvitationRsvpRepositoryInterf
                 'guest_ip'      => $data['guest_ip'] ?? null,
             ]);
         } catch (\Illuminate\Database\QueryException $e) {
-            // Duplicate entry
-            if ($e->getCode() === '23000') {
-                throw new \DomainException('RSVP already exists');
+            if (
+                $e->getCode() === '23000' &&
+                str_contains($e->getMessage(), 'invitation_rsvps_invitation_id_guest_ip_unique')
+            ) {
+                throw new DomainException('RSVP already exists');
             }
 
             throw $e;
@@ -70,5 +74,29 @@ class EloquentInvitationRsvpRepository implements InvitationRsvpRepositoryInterf
         return InvitationRsvp::where('invitation_id', $invitation->id)
             ->where('guest_ip', $ip)
             ->exists();
+    }
+
+    public function listWithStats(
+        Invitation $invitation
+    ): InvitationRsvpCollectionDto {
+
+        $rows = InvitationRsvp::query()
+            ->where('invitation_id', $invitation->id)
+            ->orderByDesc('created_at')
+            ->get([
+                'id',
+                'invitation_id',
+                'guest_name',
+                'guest_phone',
+                'status',
+                'guests_count',
+                'message',
+                'created_at',
+            ]);
+
+        return new InvitationRsvpCollectionDto(
+            items: $rows,
+            stats: InvitationRsvpStatsDto::fromCollection($rows),
+        );
     }
 }

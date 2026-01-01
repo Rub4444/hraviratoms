@@ -37,8 +37,7 @@ class InvitationRsvpController extends Controller
 
         $invitation->load(['template:id,name']);
 
-        $rsvps = $this->rsvps->forInvitation($invitation);
-        $stats = $this->rsvps->statsForInvitation($invitation);
+        $result = $this->rsvps->listWithStats($invitation);
 
         return response()->json([
             'invitation' => [
@@ -54,15 +53,15 @@ class InvitationRsvpController extends Controller
             ],
 
             'stats' => [
-                'total_responses'  => $stats->total,
-                'yes'              => $stats->byStatus['yes']['count'] ?? 0,
-                'no'               => $stats->byStatus['no']['count'] ?? 0,
-                'maybe'            => $stats->byStatus['maybe']['count'] ?? 0,
-                'guests_yes_count' => $stats->byStatus['yes']['guests'] ?? 0,
-                'guests_total'     => $stats->guestsTotal,
+                'total_responses'  => $result->stats->total,
+                'yes'              => $result->stats->byStatus['yes']['count'] ?? 0,
+                'no'               => $result->stats->byStatus['no']['count'] ?? 0,
+                'maybe'            => $result->stats->byStatus['maybe']['count'] ?? 0,
+                'guests_yes_count' => $result->stats->byStatus['yes']['guests'] ?? 0,
+                'guests_total'     => $result->stats->guestsTotal,
             ],
 
-            'items' => $rsvps->map(
+            'items' => $result->items->map(
                 fn ($rsvp) => InvitationRsvpDto::fromModel($rsvp)->toArray()
             ),
         ]);

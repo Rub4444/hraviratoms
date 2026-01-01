@@ -79,6 +79,22 @@ Route::middleware('auth')->group(function () {
 
     // Admin API (для Vue) — доступен только после логина
     Route::prefix('api')->group(function () {
+        
+        Route::post('/invitations/calculate-price', function (Request $request) {
+            $data = $request->validate([
+                'template_id' => ['required', 'exists:invitation_templates,id'],
+                'features'    => ['array'],
+            ]);
+
+            $template = \App\Models\InvitationTemplate::findOrFail($data['template_id']);
+
+            return response()->json([
+                'price' => \App\Services\InvitationPriceCalculator::calculate(
+                    $template,
+                    $data['features'] ?? []
+                ),
+            ]);
+        });
 
         Route::get('/me', [UserController::class, 'me']);
 
