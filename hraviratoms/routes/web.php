@@ -7,13 +7,11 @@ use App\Http\Controllers\Api\InvitationTemplateController;
 use App\Http\Controllers\Api\InvitationController;
 use App\Http\Controllers\InvitationRsvpController;
 use App\Http\Controllers\Api\UserController;
-use App\Http\Controllers\DemoInvitationController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Api\GuestController;
-use App\Models\InvitationTemplate;
-use App\Models\Invitation;
 use Illuminate\Http\Request;
 use App\Http\Controllers\PreviewInvitationController;
+use App\Http\Controllers\DemoInvitationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,9 +31,7 @@ Route::post('/i/{slug}/rsvp', [PublicInvitationController::class, 'submitRsvp'])
     ->name('invitation.public.rsvp');
 
 Route::get('/demo/{key}', [DemoInvitationController::class, 'show'])
-    ->name('demo.show');
-
-
+->name('demo.show');
 /**
  * ✅ Заявка на создание приглашения
  * GET — форма, POST — отправка заявки

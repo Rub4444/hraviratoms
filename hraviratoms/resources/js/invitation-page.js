@@ -1,6 +1,6 @@
 import { createApp } from "vue"
-// import '../css/app.css';
 import InvitationPublicPage from "./components/InvitationPublicPage.vue"
+import './lightbox'
 
 const el = document.getElementById("invitation-app")
 
