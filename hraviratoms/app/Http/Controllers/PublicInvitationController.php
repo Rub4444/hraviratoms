@@ -13,6 +13,7 @@ use Illuminate\View\View;
 use App\Support\InvitationFeatures;
 use App\Enums\InvitationStatus;
 use Illuminate\Database\QueryException;
+use App\Models\InvitationTemplate;
 
 class PublicInvitationController extends Controller
 {
@@ -91,27 +92,27 @@ class PublicInvitationController extends Controller
     /**
      * Показ формы заявки на создание приглашения.
      */
-    public function showRequestForm(?string $templateKey = null): View
+    public function showRequestForm(?string $templateKey = null)
     {
-        $templates = $this->templates->allActive();
-
-        $selectedTemplate = null;
-
-        if ($templateKey) {
-            $selectedTemplate = $templates->firstWhere('key', $templateKey);
-        }
-
         return view('invitation.request', [
-            'templates'        => $templates,
-            'selectedTemplate' => $selectedTemplate,
+            'templates' => InvitationTemplate::all(),
+            'selectedTemplate' =>
+                InvitationTemplate::where('key', $templateKey)->first(),
+            'demoInvitation' => session('demo.invitation'),
         ]);
     }
+
 
     /**
      * Приём заявки от обычного пользователя.
      */
     public function submitRequest(Request $request): RedirectResponse
     {
+        $demo = json_decode(
+            $request->input('demo_payload'),
+            true
+        );
+
         $data = $request->validate([
             'template_key'  => ['required', 'exists:invitation_templates,key'],
             'bride_name'    => ['required', 'string', 'max:255'],
@@ -128,6 +129,10 @@ class PublicInvitationController extends Controller
             'client_notes'  => ['nullable', 'string', 'max:2000'],
         ]);
 
+        if ($demo && isset($demo['invitation']['data'])) {
+            $data['config'] = $demo['invitation']['data'];
+        }
+
         $template = $this->templates->findActiveByKey($data['template_key']);
 
         $user = auth()->user(); // может быть null
@@ -143,7 +148,7 @@ class PublicInvitationController extends Controller
         if ($to) {
             Mail::to($to)->queue(new InvitationCreatedNotification($invitation, true));
         }
-
+        session()->forget('demo.invitation');
         return redirect()
             ->route('landing')
             ->with('request_success', 'Ձեր հայտը հաջողությամբ ուղարկվել է 🥰');

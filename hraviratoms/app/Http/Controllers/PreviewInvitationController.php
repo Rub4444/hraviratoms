@@ -14,7 +14,6 @@ class PreviewInvitationController extends Controller
     {
         $templateKey = $request->input('template_key');
 
-        // 🔥 invitation приходит как JSON-строка
         $invitationData = json_decode(
             $request->input('invitation'),
             true
@@ -26,7 +25,6 @@ class PreviewInvitationController extends Controller
 
         $template = InvitationTemplate::where('key', $templateKey)->firstOrFail();
 
-        // ✅ ФЕЙК-МОДЕЛЬ (НЕ save)
         $invitation = new Invitation([
             'bride_name'    => $invitationData['bride_name'] ?? '',
             'groom_name'    => $invitationData['groom_name'] ?? '',
@@ -38,7 +36,6 @@ class PreviewInvitationController extends Controller
             'data'          => $invitationData['data'] ?? [], // 🔥 ВАЖНО
         ]);
 
-        // 🔥 подставляем template вручную
         $invitation->setRelation('template', $template);
 
         return view(

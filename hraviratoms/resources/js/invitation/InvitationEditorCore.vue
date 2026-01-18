@@ -585,22 +585,47 @@ const buildPreviewPayload = () => ({
 const updatePreview = async () => {
   if (!previewFrame.value || !selectedTemplate.value) return
 
+  // ✅ DEMO / PUBLIC → GET preview
+  if (isDemo.value) {
+    const params = new URLSearchParams({
+      invitation: JSON.stringify({
+        bride_name: form.value.bride_name,
+        groom_name: form.value.groom_name,
+        date: form.value.date,
+        time: form.value.time,
+        venue_name: form.value.venue_name,
+        venue_address: form.value.venue_address,
+        dress_code: form.value.dress_code,
+        data: {
+          features: form.value.data.features,
+          design: form.value.data.design,
+          program: program.value,
+        },
+      }),
+    })
+
+    previewFrame.value.src =
+      `/demo/preview/${selectedTemplate.value.key}?${params.toString()}`
+
+    return
+  }
+
+  // 🔒 ADMIN → POST preview
   const payload = buildPreviewPayload()
-  
+
   const html = `
-  <form id="previewForm" method="POST" action="/preview/invitation">
+    <form id="previewForm" method="POST" action="/preview/invitation">
       <input type="hidden" name="_token" value="${csrfToken}">
       <input type="hidden" name="template_key" value="${payload.template_key}">
       <input type="hidden" name="invitation"
         value='${JSON.stringify(payload.invitation)}'>
     </form>
-    <script>
-      document.getElementById('previewForm').submit()
-    <\/script>
+    <script>document.getElementById('previewForm').submit()<\/script>
   `
 
   previewFrame.value.srcdoc = html
 }
+
 
 
 const updatePreviewDebounced = debounce(updatePreview, 500)
@@ -899,5 +924,29 @@ onMounted(async () => {
   } catch (e) {
     error.value = e.message || 'Initialization failed'
   }
+  if (window.__DEMO_INVITATION__) {
+    const demo = window.__DEMO_INVITATION__
+
+    if (demo.invitation) {
+      Object.assign(form.value, {
+        bride_name: demo.invitation.bride_name ?? '',
+        groom_name: demo.invitation.groom_name ?? '',
+        date: demo.invitation.date ?? '',
+        time: demo.invitation.time ?? '',
+        venue_name: demo.invitation.venue_name ?? '',
+        venue_address: demo.invitation.venue_address ?? '',
+        dress_code: demo.invitation.dress_code ?? '',
+      })
+
+      if (demo.invitation.data) {
+        form.value.data = normalizeConfig(demo.invitation.data)
+      }
+
+      if (demo.invitation.data?.program) {
+        program.value = demo.invitation.data.program
+      }
+    }
+  }
+
 })
 </script>

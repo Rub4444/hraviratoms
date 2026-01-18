@@ -246,6 +246,15 @@
                 Ուղարկել հայտը
             </button>
         </div>
+
+        @if($demoInvitation)
+            <input
+                type="hidden"
+                name="demo_payload"
+                value="{{ json_encode($demoInvitation) }}"
+            >
+        @endif
+
     </form>
 </div>
 </body>

@@ -1,5 +1,4 @@
-// resources/js/demo/fakeData.js
-export const fakeInvitation = {
+export const demoInvitation = {
   bride_name: 'Անահիտ',
   groom_name: 'Արամ',
   date: '2026-06-20',
@@ -12,13 +11,6 @@ export const fakeInvitation = {
       gallery: true,
       program: true,
       rsvp: true,
-    },
-    design: {
-      colors: {
-        primary: '#16a34a',
-        accent: '#22c55e',
-        background: '#ffffff',
-      },
     },
     program: [
       { time: '18:00', label: 'Ceremony' },

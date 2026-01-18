@@ -1,3 +1,18 @@
+@php
+  $design =
+    $invitation->data['design']
+    ?? $invitation->template->config['design']
+    ?? [];
+
+  $colors = $design['colors'] ?? [];
+  $fonts  = $design['fonts'] ?? [];
+
+  $theme =
+    $invitation->data['design']['theme']
+    ?? $invitation->template->config['theme']
+    ?? null;
+@endphp
+
 <!DOCTYPE html>
 <html lang="hy">
 <head>
@@ -14,7 +29,18 @@
 </head>
 
 <body>
-    <div class="invite-page @yield('theme')">
+    <div
+        class="invite-page {{ $theme ? 'theme-'.$theme : '' }}"
+        style="
+            --color-primary: {{ $colors['primary'] ?? '' }};
+            --color-accent: {{ $colors['accent'] ?? '' }};
+            --color-bg: {{ $colors['background'] ?? '' }};
+            --font-heading: {{ $fonts['heading'] ?? '' }};
+            --font-body: {{ $fonts['body'] ?? '' }};
+        "
+        >
+
+
         <div class="invite-card">
             @yield('content')
         </div>

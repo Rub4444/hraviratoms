@@ -30,8 +30,7 @@ Route::get('/i/{slug}', [PublicInvitationController::class, 'show'])
 Route::post('/i/{slug}/rsvp', [PublicInvitationController::class, 'submitRsvp'])
     ->name('invitation.public.rsvp');
 
-Route::get('/demo/{key}', [DemoInvitationController::class, 'show'])
-->name('demo.show');
+
 /**
  * ✅ Заявка на создание приглашения
  * GET — форма, POST — отправка заявки
@@ -60,10 +59,44 @@ Route::get('/api/invitation-pricing', function () {
     ]);
 });
 
-/**
- * 🔍 Live preview приглашения (для админки)
- */
+
 Route::post('/preview/invitation', [PreviewInvitationController::class, 'show']);
+
+Route::get('/demo/preview/{template}', [DemoInvitationController::class, 'preview'])
+    ->name('demo.preview');
+
+Route::get('/demo/{key}', [DemoInvitationController::class, 'show'])
+->name('demo.show');
+
+Route::post('/demo/to-request', function (Request $request) {
+
+    $data = json_decode($request->input('demo_payload'), true);
+
+    // сохраняем во временную сессию
+    session()->put('demo.invitation', $data);
+
+    // редиректим на форму заявки
+    return redirect()->route(
+        'invitation.request.form',
+        ['templateKey' => $data['template'] ?? null]
+    );
+});
+
+Route::post('/api/demo/calculate-price', function (Request $request) {
+    $data = $request->validate([
+        'template_key' => 'required|exists:invitation_templates,key',
+        'features' => 'array',
+    ]);
+
+    $template = \App\Models\InvitationTemplate::where('key', $data['template_key'])->firstOrFail();
+
+    return response()->json([
+        'price' => \App\Services\InvitationPriceCalculator::calculate(
+            $template,
+            $data['features'] ?? []
+        )
+    ]);
+});
 
 // Всё, что ниже — только для залогиненных
 Route::middleware('auth')->group(function () {
