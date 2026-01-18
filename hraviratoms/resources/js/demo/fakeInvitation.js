@@ -16,6 +16,11 @@ export const demoInvitation = {
       { time: '18:00', label: 'Ceremony' },
       { time: '19:30', label: 'Dinner' },
     ],
-    gallery: [],
+    gallery: [
+      { path: 'demo/gallery/gallery-1.png' },
+      { path: 'demo/gallery/gallery-2.png' },
+      { path: 'demo/gallery/gallery-3.png' },
+      { path: 'demo/gallery/gallery-4.png' },
+    ],
   }
 }

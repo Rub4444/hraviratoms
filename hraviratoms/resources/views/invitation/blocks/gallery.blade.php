@@ -8,21 +8,25 @@
 
     <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
         @foreach($invitation->data['gallery'] as $index => $img)
-            <button
-                type="button"
-                class="group relative block overflow-hidden rounded-xl"
-                data-lightbox
-                data-index="{{ $index }}"
-                data-src="{{ asset('storage/'.$img['path']) }}"
-            >
-                <img
-                    src="{{ asset('storage/'.$img['path']) }}"
-                    class="h-40 w-full object-cover transition duration-300 group-hover:scale-105"
-                    loading="lazy"
-                >
+            
+            @php
+                $src = $img['url'] ?? asset($img['path']);
+            @endphp
 
-                <div class="absolute inset-0 bg-black/0 transition group-hover:bg-black/10"></div>
+            <button
+            type="button"
+            class="group relative block overflow-hidden rounded-xl"
+            data-lightbox
+            data-index="{{ $index }}"
+            data-src="{{ $src }}"
+            >
+            <img
+                src="{{ $src }}"
+                class="h-40 w-full object-cover transition duration-300 group-hover:scale-105"
+                loading="lazy"
+            >
             </button>
+
         @endforeach
     </div>
 </div>
