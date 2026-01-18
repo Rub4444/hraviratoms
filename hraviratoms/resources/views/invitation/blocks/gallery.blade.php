@@ -1,4 +1,3 @@
-{{-- invitation/blocks/gallery.blade.php --}}
 @if(($features['gallery'] ?? false) && !empty($invitation->data['gallery']))
 
 <div class="border-t border-slate-200/70 px-6 py-6">
@@ -8,11 +7,13 @@
 
     <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
         @foreach($invitation->data['gallery'] as $index => $img)
-            
             @php
-                $src = $img['url'] ?? asset($img['path']);
+            $src = isset($img['path'])
+                ? asset('storage/'.$img['path'])
+                : ($img['url'] ?? null);
             @endphp
 
+            @if($src)
             <button
             type="button"
             class="group relative block overflow-hidden rounded-xl"
@@ -26,6 +27,7 @@
                 loading="lazy"
             >
             </button>
+            @endif
 
         @endforeach
     </div>

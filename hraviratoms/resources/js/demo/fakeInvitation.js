@@ -17,10 +17,10 @@ export const demoInvitation = {
       { time: '19:30', label: 'Dinner' },
     ],
     gallery: [
-      { path: 'demo/gallery/gallery-1.png' },
-      { path: 'demo/gallery/gallery-2.png' },
-      { path: 'demo/gallery/gallery-3.png' },
-      { path: 'demo/gallery/gallery-4.png' },
+      { path: 'demo/gallery/gallery-1.png', url: '/demo/gallery/gallery-1.png'},
+      { path: 'demo/gallery/gallery-2.png', url: '/demo/gallery/gallery-2.png' },
+      { path: 'demo/gallery/gallery-3.png', url: '/demo/gallery/gallery-3.png' },
+      { path: 'demo/gallery/gallery-4.png', url: '/demo/gallery/gallery-4.png' },
     ],
   }
 }

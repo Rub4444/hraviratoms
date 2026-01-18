@@ -416,7 +416,10 @@ const previewSignature = computed(() => {
     features: form.value.data.features,
     design: form.value.data.design,
     program: program.value,
-    gallery: gallery.value.map(g => g.path ?? g.url),
+    gallery: gallery.value.map(g => ({
+      url: g.url,
+    }))
+
   })
 })
 
@@ -576,8 +579,8 @@ const buildPreviewPayload = () => ({
       design: form.value.data.design,
       program: program.value,
       gallery: gallery.value.map(img => ({
-        path: img.path ?? img.url?.replace('/storage/', '')
-      })),
+        url: img.url,
+      }))
     }
   }
 })
@@ -600,6 +603,9 @@ const updatePreview = async () => {
           features: form.value.data.features,
           design: form.value.data.design,
           program: program.value,
+          gallery: gallery.value.map(img => ({
+            url: img.url,
+          }))
         },
       }),
     })
@@ -863,6 +869,9 @@ const handleSubmit = async () => {
         features: { ...form.value.data.features },
         design: { ...form.value.data.design },
         program: program.value,
+        gallery: gallery.value.map(img => ({
+          path: img.path ?? img.url.replace('/storage/', ''),
+        })),
       },
     }
 
